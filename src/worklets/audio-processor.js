@@ -1,9 +1,21 @@
+const SAMPLE_RATE = 44100;
+const MIN_FREQUENCY = 0;
+const MAX_FREQUENCY = 20_000;
+const DEFAULT_FREQUENCY = 440;
+
 class CustomOscillatorProcessor extends AudioWorkletProcessor {
     static get parameterDescriptors() {
         return [
             {
-                name: "mix",
-                defaultValue: 0.0,
+                name: "frequency",
+                defaultValue: DEFAULT_FREQUENCY,
+                minValue: MIN_FREQUENCY,
+                maxValue: MAX_FREQUENCY,
+                automationRate: "a-rate",
+            },
+            {
+                name: "playing",
+                defaultValue: 1.0,
                 minValue: 0.0,
                 maxValue: 1.0,
                 automationRate: "a-rate",
@@ -13,14 +25,34 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
 
     constructor() {
         super();
-        this.phase = 0; // Ensure phase is initialized
+        this.phase = 0;
+        this.port.onmessage = (event) => {
+            this.oscillator1 = event.data.oscillator1;
+            this.oscillator2 = event.data.oscillator2;
+            this.filter = event.data.filter;
+            this.envelope = event.data.envelope;
+            this.lfo = event.data.LFO;
+        };
     }
 
+    /**
+     * System-invoked process callback function.
+     * @param  {Array} inputs Incoming audio stream.
+     * @param  {Array} outputs Outgoing audio stream.
+     * @param  {Object} parameters AudioParam data.
+     * @return {Boolean} Active source flag.
+     */
     process(inputs, outputs, parameters) {
         const output = outputs[0];
-        const mixParam = parameters.mix;
-        const frequency = 440;
-        const sampleRate = 44100;
+        const frequency = parameters.frequency[0];
+        const playing = Boolean(parameters.playing[0]);
+        const sampleRate = SAMPLE_RATE;
+
+        //console.log(frequency, gain);
+
+        if (!playing) {
+            return true;
+        }
 
         for (let channel = 0; channel < output.length; ++channel) {
             const outputChannel = output[channel];
@@ -31,10 +63,9 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
                     this.phase -= 2 * Math.PI;
                 }
 
-                const mix = mixParam.length > 1 ? mixParam[i] : mixParam[0]; // Correctly handle a-rate or k-rate
                 const sineWave = Math.sin(this.phase);
                 const squareWave = Math.sign(sineWave);
-                outputChannel[i] = (1 - mix) * sineWave + mix * squareWave;
+                outputChannel[i] = squareWave;
             }
         }
 

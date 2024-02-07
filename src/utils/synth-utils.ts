@@ -102,7 +102,7 @@ const initialEnvelope: Envelope = {
   release: 0,
 }
 
-interface SynthStore {
+export interface SynthStore {
   oscillator1: Oscillator;
   oscillator2: Oscillator;
   filter: Filter;
