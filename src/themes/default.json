@@ -1,0 +1,15 @@
+{
+  "graph": {
+    "bg": "#d1d5db",
+    "lines": "#52525b",
+    "node": {
+      "bg": "#f3f4f6",
+      "border": "#4b5563"
+    },
+    "edge": {
+      "line": "#111827",
+      "underline": "#000000",
+      "circle": "#1f2937"
+    }
+  }
+}
