@@ -26,6 +26,7 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
         this.phase = 0;
+        this.currentSample = 0;
         this.port.onmessage = (event) => {
             this.oscillator1 = event.data.oscillator1;
             this.oscillator2 = event.data.oscillator2;
@@ -47,8 +48,7 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
         const frequency = parameters.frequency[0];
         const playing = Boolean(parameters.playing[0]);
         const sampleRate = SAMPLE_RATE;
-
-        //console.log(frequency, gain);
+        const samplesPerCycle = sampleRate / frequency;
 
         if (!playing) {
             return true;
@@ -59,13 +59,14 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
             for (let i = 0; i < outputChannel.length; ++i) {
                 const phaseIncrement = (2 * Math.PI * frequency) / sampleRate;
                 this.phase += phaseIncrement;
-                if (this.phase > 2 * Math.PI) {
+                if (this.currentSample >= samplesPerCycle) {
+                    this.currentSample = 0;
                     this.phase -= 2 * Math.PI;
                 }
-
                 const sineWave = Math.sin(this.phase);
                 const squareWave = Math.sign(sineWave);
-                outputChannel[i] = squareWave;
+                outputChannel[i] = sineWave * 0;
+                this.currentSample++;
             }
         }
 

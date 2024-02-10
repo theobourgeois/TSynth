@@ -11,6 +11,7 @@ import {
     Node,
     getNeighboursFromNodes,
 } from "../../utils/graph-utils";
+import { useContainerDimensions } from "../../utils/custom-hooks";
 
 type GraphProps = {
     showGrid?: boolean;
@@ -39,29 +40,7 @@ export function Graph({
 }: GraphProps) {
     const styles = useStyles();
     const graphRef = useRef<HTMLDivElement>(null);
-    const [dimensions, setDimensions] = useState<Dimensions>({
-        width: 0,
-        height: 0,
-        left: 0,
-        top: 0,
-    });
-
-    useEffect(() => {
-        const handleSetDimensions = () => {
-            const graphDimensions = graphRef.current?.getBoundingClientRect();
-            setDimensions({
-                width: graphDimensions?.width ?? 0,
-                height: graphDimensions?.height ?? 0,
-                left: graphDimensions?.left ?? 0,
-                top: graphDimensions?.top ?? 0,
-            });
-        };
-        handleSetDimensions();
-        window.addEventListener("resize", handleSetDimensions);
-        return () => {
-            window.removeEventListener("resize", handleSetDimensions);
-        };
-    }, [graphRef]);
+    const dimensions = useContainerDimensions(graphRef);
 
     const handleChangeEdge = (edge: Edge) => {
         if (!onChange) {
@@ -207,7 +186,8 @@ export function Graph({
                 <Grid
                     dimensions={dimensions}
                     showGrid={showGrid}
-                    gridSize={gridSize}
+                    gridSizeX={gridSize}
+                    gridSizeY={gridSize}
                 />
                 <Nodes
                     showNodes={showNodes}

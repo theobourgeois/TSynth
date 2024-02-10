@@ -8,12 +8,18 @@ const useStyles = createStyles((theme) => ({
 }));
 
 type GridProps = {
-    gridSize: number;
-    showGrid: boolean;
+    gridSizeX: number;
+    gridSizeY: number;
+    showGrid?: boolean;
     dimensions: Dimensions;
 };
 
-export function Grid({ gridSize, showGrid, dimensions }: GridProps) {
+export function Grid({
+    gridSizeX,
+    gridSizeY,
+    showGrid = true,
+    dimensions,
+}: GridProps) {
     const styles = useStyles();
     const { width, height } = dimensions;
 
@@ -23,22 +29,22 @@ export function Grid({ gridSize, showGrid, dimensions }: GridProps) {
 
     return (
         <>
-            {Array.from({ length: gridSize }, (_, i) => (
+            {Array.from({ length: gridSizeX + 1 }, (_, i) => (
                 <div
                     className="w-[1px] h-full bg-black absolute"
                     style={{
                         ...styles.lines,
-                        left: (width / gridSize) * i + "px",
+                        left: (width / gridSizeX) * i + "px",
                     }}
                     key={i}
                 />
             ))}
-            {Array.from({ length: gridSize }, (_, i) => (
+            {Array.from({ length: gridSizeY + 1 }, (_, i) => (
                 <div
                     className="h-[1px] w-full bg-black absolute"
                     style={{
                         ...styles.lines,
-                        top: (height / gridSize) * i + "px",
+                        top: (height / gridSizeY) * i + "px",
                     }}
                     key={i}
                 />

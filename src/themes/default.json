@@ -11,5 +11,8 @@
       "underline": "#000000",
       "circle": "#1f2937"
     }
+  },
+  "waveform": {
+    "line": "#008B8B"
   }
 }

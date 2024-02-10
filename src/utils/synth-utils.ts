@@ -1,6 +1,24 @@
 import { create } from "zustand";
 
-export type WaveData = TODO;
+export enum SampleType {
+  Sine = "sine",
+  Square = "square",
+  Sawtooth = "sawtooth",
+  Triangle = "triangle",
+}
+
+export type Sample = {
+  type: SampleType;
+  period: number; // in samples
+  amplitude: number; // -1 to 1
+  offset: number; // -1 to 1
+  noise: number; // 0 to 1
+}
+
+export type WaveData = {
+  sampleCount: number;
+  samples: Sample[];
+}
 
 export type Wave = {
   data: WaveData;
@@ -125,4 +143,93 @@ const useSynthStore = create<SynthStore>((set) => ({
 
 export function useSynth() {
   return useSynthStore((state) => state);
+}
+
+// f prefix means flipped
+export enum WaveEditorWaveType {
+  Sine = "sine",
+  FSine = "usine",
+  Square = "square",
+  Triangle = "triangle",
+  FTriangle = "ftriangle",
+  Sawtooth = "sawtooth",
+  FSawtooth = "fsawtooth",
+  Noise = "noise",
+  Line = "line",
+}
+
+export function getSampleDataFromType(
+  type: WaveEditorWaveType,
+  currentSample: Sample,
+  gridSizeY: number,
+  snapY: number,
+  y: number
+) {
+  const amplitude = snapY === -1 ? 0 : (1 / gridSizeY) * 2
+  switch (type) {
+    case WaveEditorWaveType.Sine:
+      return {
+        type: SampleType.Sine,
+        amplitude: amplitude,
+        noise: 0,
+        offset: snapY,
+        period: 1,
+      };
+    case WaveEditorWaveType.FSine:
+      return {
+        type: SampleType.Sine,
+        amplitude: -amplitude,
+        noise: 0,
+        offset: snapY,
+        period: 1,
+      };
+    case WaveEditorWaveType.Square:
+      return {
+        type: SampleType.Square,
+        amplitude: Math.sign(snapY) * amplitude,
+        noise: 0,
+        offset: snapY,
+        period: 1,
+      };
+    case WaveEditorWaveType.Triangle:
+      return {
+        type: SampleType.Triangle,
+        amplitude: amplitude,
+        noise: 0,
+        offset: snapY,
+        period: 1,
+      };
+    case WaveEditorWaveType.FTriangle:
+      return {
+        type: SampleType.Triangle,
+        amplitude: -amplitude,
+        noise: 0,
+        offset: snapY,
+        period: 1,
+      };
+    case WaveEditorWaveType.Sawtooth:
+      return {
+        type: SampleType.Sawtooth,
+        amplitude: amplitude,
+        noise: 0,
+        offset: snapY,
+        period: 1,
+      };
+    case WaveEditorWaveType.FSawtooth:
+      return {
+        type: SampleType.Sawtooth,
+        amplitude: -amplitude,
+        noise: 0,
+        offset: snapY,
+        period: 1,
+      };
+    case WaveEditorWaveType.Noise:
+      const noiseLevel = 1 - Math.abs(y);
+      return {
+        ...currentSample,
+        noise: noiseLevel,
+      };
+    default:
+      return currentSample;
+  }
 }
