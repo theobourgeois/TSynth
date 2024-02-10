@@ -54,19 +54,20 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
             return true;
         }
 
+        const data = this.oscillator1.wave.data;
+        console.log(output);
+
         for (let channel = 0; channel < output.length; ++channel) {
             const outputChannel = output[channel];
+            // Calculate playback rate factor based on desired frequency and data length
+            const playbackRate = (frequency * data.length) / sampleRate;
             for (let i = 0; i < outputChannel.length; ++i) {
-                const phaseIncrement = (2 * Math.PI * frequency) / sampleRate;
-                this.phase += phaseIncrement;
-                if (this.currentSample >= samplesPerCycle) {
-                    this.currentSample = 0;
-                    this.phase -= 2 * Math.PI;
+                if (this.currentSample >= data.length) {
+                    this.currentSample = 0; // Reset to start if we've reached the end of the data
                 }
-                const sineWave = Math.sin(this.phase);
-                const squareWave = Math.sign(sineWave);
-                outputChannel[i] = sineWave * 0;
-                this.currentSample++;
+                // Use the playback rate to adjust how we increment through the data
+                outputChannel[i] = data[Math.floor(this.currentSample)]; // Assuming 'gain' is defined elsewhere
+                this.currentSample += playbackRate; // Increment by playback rate
             }
         }
 

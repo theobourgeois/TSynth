@@ -15,10 +15,7 @@ export type Sample = {
   noise: number; // 0 to 1
 }
 
-export type WaveData = {
-  sampleCount: number;
-  samples: Sample[];
-}
+export type WaveData = number[]
 
 export type Wave = {
   data: WaveData;
@@ -68,7 +65,7 @@ export type Envelope = {
 
 const initialOsillator1: Oscillator = {
   wave: {
-    data: {},
+    data: Array.from({ length: 512 }, (_, i) => Math.sin(i / 30)),
     octave: 0,
     semitone: 0,
     fine: 0,
@@ -83,7 +80,7 @@ const initialOsillator1: Oscillator = {
 
 const initialOsillator2: Oscillator = {
   wave: {
-    data: {},
+    data: Array.from({ length: 512 }, (_, i) => Math.sin(i / 30)),
     octave: 0,
     semitone: 0,
     fine: 0,
@@ -120,12 +117,20 @@ const initialEnvelope: Envelope = {
   release: 0,
 }
 
-export interface SynthStore {
+export interface SynthState {
   oscillator1: Oscillator;
   oscillator2: Oscillator;
   filter: Filter;
   LFO: LFO;
   envelope: Envelope;
+}
+
+export interface SynthStore extends SynthState {
+  setOscillator1: (oscillator: Oscillator) => void;
+  setOscillator2: (oscillator: Oscillator) => void;
+  setFilter: (filter: Filter) => void;
+  setLFO: (LFO: LFO) => void;
+  setEnvelope: (envelope: Envelope) => void;
 }
 
 const useSynthStore = create<SynthStore>((set) => ({
@@ -160,25 +165,23 @@ export enum WaveEditorWaveType {
 
 export function getSampleDataFromType(
   type: WaveEditorWaveType,
-  currentSample: Sample,
   gridSizeY: number,
   snapY: number,
-  y: number
 ) {
   const amplitude = snapY === -1 ? 0 : (1 / gridSizeY) * 2
   switch (type) {
     case WaveEditorWaveType.Sine:
       return {
         type: SampleType.Sine,
-        amplitude: amplitude,
+        amplitude: -amplitude,
         noise: 0,
-        offset: snapY,
+        offset: snapY - (1 / gridSizeY) * 2,
         period: 1,
       };
     case WaveEditorWaveType.FSine:
       return {
         type: SampleType.Sine,
-        amplitude: -amplitude,
+        amplitude: amplitude,
         noise: 0,
         offset: snapY,
         period: 1,
@@ -194,15 +197,15 @@ export function getSampleDataFromType(
     case WaveEditorWaveType.Triangle:
       return {
         type: SampleType.Triangle,
-        amplitude: amplitude,
+        amplitude: -amplitude,
         noise: 0,
-        offset: snapY,
+        offset: snapY - (1 / gridSizeY) * 2,
         period: 1,
       };
     case WaveEditorWaveType.FTriangle:
       return {
         type: SampleType.Triangle,
-        amplitude: -amplitude,
+        amplitude: amplitude,
         noise: 0,
         offset: snapY,
         period: 1,
@@ -210,26 +213,26 @@ export function getSampleDataFromType(
     case WaveEditorWaveType.Sawtooth:
       return {
         type: SampleType.Sawtooth,
-        amplitude: amplitude,
+        amplitude: -amplitude,
         noise: 0,
-        offset: snapY,
+        offset: snapY - (1 / gridSizeY) * 2,
         period: 1,
       };
     case WaveEditorWaveType.FSawtooth:
       return {
         type: SampleType.Sawtooth,
-        amplitude: -amplitude,
+        amplitude: amplitude,
         noise: 0,
         offset: snapY,
         period: 1,
       };
-    case WaveEditorWaveType.Noise:
-      const noiseLevel = 1 - Math.abs(y);
-      return {
-        ...currentSample,
-        noise: noiseLevel,
-      };
-    default:
-      return currentSample;
+    // case WaveEditorWaveType.Noise:
+    //   const noiseLevel = 1 - Math.abs(y);
+    //   return {
+    //     ...currentSample,
+    //     noise: noiseLevel,
+    //   };
+    // default:
+    //   return currentSample;
   }
 }

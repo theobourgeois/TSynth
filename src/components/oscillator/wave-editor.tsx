@@ -1,7 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createStyles } from "../../utils/theme-utils";
 import { Grid } from "../graph/grid";
 import {
+    Sample,
+    SampleType,
     WaveData,
     WaveEditorWaveType,
     getSampleDataFromType,
@@ -17,10 +19,25 @@ const useStyles = createStyles((theme) => ({
     },
 }));
 
+function getYFromSample(sample: SampleType, phase: number) {
+    switch (sample) {
+        case SampleType.Sine:
+            return Math.sin(phase);
+        case SampleType.Square:
+            return Math.sign(Math.sin(phase));
+        case SampleType.Triangle:
+            return Math.asin(Math.sin(phase)) * (2 / Math.PI);
+        case SampleType.Sawtooth:
+            return (phase / Math.PI) % 2;
+        default:
+            return 0;
+    }
+}
+
 type WaveEditorProps = {
     gridSizeX: number;
     gridSizeY: number;
-    onChangeSamples: (data: WaveData["samples"]) => void;
+    onChange: (data: WaveData) => void;
     data: WaveData;
 };
 
@@ -28,7 +45,7 @@ export function WaveEditor({
     gridSizeX,
     gridSizeY,
     data,
-    onChangeSamples,
+    onChange,
 }: WaveEditorProps) {
     const styles = useStyles();
     const editorRef = useRef<HTMLDivElement>(null);
@@ -36,6 +53,11 @@ export function WaveEditor({
     const [waveType, setWaveType] = useState<WaveEditorWaveType>(
         WaveEditorWaveType.FSine
     );
+    const currentData = useRef(data);
+
+    useEffect(() => {
+        currentData.current = data;
+    }, [data]);
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         const { width, height, left, top } = dimensions;
@@ -48,29 +70,51 @@ export function WaveEditor({
                 Math.min((midPoint - y) / midPoint, 1),
                 -1
             );
-            const relativeY = snapTo(normalizedY, (1 / gridSizeY) * 2);
 
-            let sampleIndex = 0;
-            let currPeriod = 0;
-            for (let j = 0; j < data.samples.length; j++) {
-                currPeriod += data.samples[j].period;
-                if (currPeriod * (width / data.sampleCount) > x) {
-                    sampleIndex = j;
-                    break;
+            const normalizedX = snapTo(
+                Math.max(Math.min(x / width, 1), 0),
+                1 / gridSizeX,
+                "floor"
+            );
+
+            // store output
+            const dataArray = [];
+            const sampleData = getSampleDataFromType(
+                waveType,
+                gridSizeY,
+                snapTo(normalizedY, (1 / gridSizeY) * 2, "ceil")
+            );
+
+            const sampleSize = data.length / gridSizeX;
+            if (sampleData) {
+                const { period, amplitude, type, offset } = sampleData;
+                let phase = 0;
+
+                for (let i = 0; i < sampleSize; i++) {
+                    const wave =
+                        getYFromSample(type, phase) * amplitude - offset;
+                    dataArray.push(wave);
+                    const pixelsPerPeriod = period * sampleSize;
+                    phase += (Math.PI * 2) / pixelsPerPeriod / 2;
                 }
             }
 
-            const newData = [...data.samples];
-            const sample = getSampleDataFromType(
-                waveType,
-                newData[sampleIndex],
-                gridSizeY,
-                relativeY,
-                normalizedY
-            );
-            newData[sampleIndex] = sample;
+            const newData = [...currentData.current];
+            const startIndex = Math.floor(normalizedX * newData.length);
 
-            onChangeSamples(newData);
+            if (startIndex > newData.length - sampleSize) return;
+            for (let i = 0; i < sampleSize; i++) {
+                let noiseModifier = 0;
+                if (waveType === WaveEditorWaveType.Noise) {
+                    noiseModifier =
+                        1 - Math.abs(normalizedY) * Math.random() * 2;
+                }
+                const newY = noiseModifier
+                    ? data[i] + noiseModifier
+                    : dataArray[i];
+                newData[startIndex + i] = newY;
+            }
+            onChange(newData);
         };
         handleMouseMove(e);
         window.addEventListener("mousemove", handleMouseMove);

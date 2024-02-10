@@ -1,4 +1,4 @@
-import { SynthStore } from "./synth-utils";
+import { SynthState } from "./synth-utils";
 
 export class AudioProcessor {
 
@@ -9,7 +9,7 @@ export class AudioProcessor {
     this.audioContext = new AudioContext();
   }
 
-  async setProcessorData(data: SynthStore) {
+  async setProcessorData(data: SynthState) {
     if (!this.audioProcessingNode) {
       await this.startAudioWorklets();
     }
@@ -32,11 +32,11 @@ export class AudioProcessor {
       this.audioContext.resume();
     }
     this.audioProcessingNode?.parameters?.get("frequency")?.setValueAtTime(frequency, this.audioContext.currentTime);
-    this.audioProcessingNode?.parameters?.get("playing")?.linearRampToValueAtTime(1, this.audioContext.currentTime);
+    this.audioProcessingNode?.parameters?.get("playing")?.setValueAtTime(1, this.audioContext.currentTime);
   }
 
   stop() {
-    this.audioProcessingNode?.parameters?.get("playing")?.linearRampToValueAtTime(0, this.audioContext.currentTime);
+    this.audioProcessingNode?.parameters?.get("playing")?.setValueAtTime(0, this.audioContext.currentTime);
   }
 
   async startAudioWorklets() {
