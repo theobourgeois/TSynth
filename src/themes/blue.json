@@ -1,0 +1,25 @@
+{
+  "background": "#416FB5",
+  "logo": "#FFFFFF",
+  "tvBorder": "#3B63A0",
+  "tvBackground": "#416FB5",
+  "tvShadow": "#2B5490",
+  "tvHighlight": "#4884DF",
+  "tvScreenOutline": "#292929",
+  "tvButton": "#3468B6",
+  "lightOn": "#32A10A",
+  "lightOff": "#898989",
+  "screenPrimary": "#1D2E46",
+  "screenShine": "#264066",
+  "screenSecondary": "#94B6E9",
+  "screenLine": "#32A10A",
+  "screenNode": "#1D8BBA",
+  "screenGrid": "#7593C1",
+  "knob": {
+    "color": "#5E8FD9",
+    "bg": "#D7D7D7",
+    "indicator": "#C8C8C8",
+    "master": "#FF0000"
+  },
+  "text": "#FFFFFF"
+}

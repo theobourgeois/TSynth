@@ -28,10 +28,12 @@ export type Oscillator = {
   wave: Wave;
   unison: number;
   detune: number;
-  phase: number;
-  rand: number;
   pan: number;
   level: number;
+  octave: number;
+  semitone: number;
+  fine: number;
+  enabled: boolean;
 }
 
 export type FilterPreset = TODO;
@@ -43,6 +45,7 @@ export type Filter = {
   pan: number;
   drive: number;
   mix: number;
+  enabled: boolean;
   osc1Enabled: boolean;
   osc2Enabled: boolean;
 }
@@ -64,36 +67,41 @@ export type Envelope = {
 };
 
 const initialOsillator1: Oscillator = {
+  enabled: true,
   wave: {
     data: Array.from({ length: 512 }, (_, i) => Math.sin(i / 30)),
     octave: 0,
     semitone: 0,
     fine: 0,
   },
+  semitone: 0,
+  octave: 0,
+  fine: 0,
   unison: 0,
   detune: 0,
-  phase: 0,
-  rand: 0,
   pan: 0,
   level: 0,
 }
 
 const initialOsillator2: Oscillator = {
+  enabled: false,
   wave: {
     data: Array.from({ length: 512 }, (_, i) => Math.sin(i / 30)),
     octave: 0,
     semitone: 0,
     fine: 0,
   },
+  semitone: 0,
+  octave: 0,
+  fine: 0,
   unison: 0,
   detune: 0,
-  phase: 0,
-  rand: 0,
   pan: 0,
   level: 0,
 }
 
 const initialFilter: Filter = {
+  enabled: false,
   preset: {},
   cutoff: 0,
   resonance: 0,

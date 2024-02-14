@@ -31,12 +31,15 @@ export class AudioProcessor {
     if (this.audioContext.state === "suspended") {
       this.audioContext.resume();
     }
-    this.audioProcessingNode?.parameters?.get("frequency")?.setValueAtTime(frequency, this.audioContext.currentTime);
     this.audioProcessingNode?.parameters?.get("playing")?.setValueAtTime(1, this.audioContext.currentTime);
+    this.audioProcessingNode?.port.postMessage({ addFrequency: frequency });
   }
 
-  stop() {
-    this.audioProcessingNode?.parameters?.get("playing")?.setValueAtTime(0, this.audioContext.currentTime);
+  stop(freq?: number) {
+    //this.audioProcessingNode?.parameters?.get("playing")?.setValueAtTime(0, this.audioContext.currentTime);
+    if (freq) {
+      this.audioProcessingNode?.port.postMessage({ removeFrequency: freq });
+    }
   }
 
   async startAudioWorklets() {

@@ -1,18 +1,25 @@
 {
-  "graph": {
-    "bg": "#d1d5db",
-    "lines": "#52525b",
-    "node": {
-      "bg": "#f3f4f6",
-      "border": "#4b5563"
-    },
-    "edge": {
-      "line": "#111827",
-      "underline": "#000000",
-      "circle": "#1f2937"
-    }
+  "background": "#DEDEDE",
+  "logo": "#444444",
+  "tvBorder": "#E3E3E3",
+  "tvBackground": "#B9B9B9",
+  "tvShadow": "#989696",
+  "tvHighlight": "#DCDCDC",
+  "tvScreenOutline": "#292929",
+  "tvButton": "#BABABA",
+  "lightOn": "#4B66F0",
+  "lightOff": "#898989",
+  "screenPrimary": "#1D2E46",
+  "screenShine": "#264066",
+  "screenSecondary": "#94B6E9",
+  "screenLine": "#00A3FF",
+  "screenNode": "#1D8BBA",
+  "screenGrid": "#7593C1",
+  "knob": {
+    "color": "#ACACAC",
+    "bg": "#D7D7D7",
+    "indicator": "#C8C8C8",
+    "master": "#1D8BBA"
   },
-  "waveform": {
-    "line": "#008B8B"
-  }
+  "text": "#3A3A3A"
 }
