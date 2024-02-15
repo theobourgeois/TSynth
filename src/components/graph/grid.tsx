@@ -3,7 +3,7 @@ import { Dimensions } from "../../utils/typings-utils";
 
 const useStyles = createStyles((theme) => ({
     lines: {
-        backgroundColor: theme.graph.lines,
+        backgroundColor: theme.screenGrid,
     },
 }));
 

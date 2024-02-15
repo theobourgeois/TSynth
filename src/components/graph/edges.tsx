@@ -55,7 +55,8 @@ function getBoundedCurveValues(
 type EdgesProps = {
     edges: Edge[];
     nodes: Node[];
-    gridSize: number;
+    gridSizeX: number;
+    gridSizeY: number;
     dimensions: Dimensions;
     onChange: (edge: Edge) => void;
     snapValue?: number;
@@ -65,7 +66,8 @@ type EdgesProps = {
 export function Edges({
     edges,
     nodes,
-    gridSize,
+    gridSizeY,
+    gridSizeX,
     dimensions,
     snapValue,
     onChange,
@@ -81,7 +83,8 @@ export function Edges({
                     onChange={onChange}
                     edge={edge}
                     nodes={nodes}
-                    gridSize={gridSize}
+                    gridSizeY={gridSizeY}
+                    gridSizeX={gridSizeX}
                     dimensions={dimensions}
                 />
             ))}
@@ -92,7 +95,8 @@ export function Edges({
 type EdgeProps = {
     edge: Edge;
     nodes: Node[];
-    gridSize: number;
+    gridSizeX: number;
+    gridSizeY: number;
     dimensions: Dimensions;
     onChange: (edge: Edge) => void;
     snapValue?: number;
@@ -103,7 +107,8 @@ type EdgeProps = {
 function Edge({
     edge,
     nodes,
-    gridSize,
+    gridSizeX,
+    gridSizeY,
     dimensions,
     onChange,
     showNodes,
@@ -112,8 +117,8 @@ function Edge({
     const theme = useTheme();
     const { width, height, left, top } = dimensions;
 
-    const nodeLeft = (node: Node) => (width / gridSize) * node.x;
-    const nodeTop = (node: Node) => (height / gridSize) * node.y;
+    const nodeLeft = (node: Node) => (width / gridSizeX) * node.x;
+    const nodeTop = (node: Node) => (height / gridSizeY) * node.y;
 
     const sourceNode = nodes.find((node) => node.id === edge.source);
     const targetNode = nodes.find((node) => node.id === edge.target);
@@ -129,8 +134,8 @@ function Edge({
     const targetY = nodeTop(targetNode);
 
     // curve relative to the grid
-    const unBoundCurveY = edge.curveY * (height / gridSize);
-    const unBoundCurveX = edge.curveX * (width / gridSize);
+    const unBoundCurveY = edge.curveY * (height / gridSizeX);
+    const unBoundCurveX = edge.curveX * (width / gridSizeY);
 
     const { controlX, controlY, minX, maxX, minY, maxY } =
         getBoundedCurveValues(
@@ -150,8 +155,8 @@ function Edge({
             const x = e.clientX - left - minX;
             const y = e.clientY - top - minY;
 
-            const scaleFactorX = width / gridSize;
-            const scaleFactorY = height / gridSize;
+            const scaleFactorX = width / gridSizeX;
+            const scaleFactorY = height / gridSizeY;
 
             const midpointX = (maxX - minX) / scaleFactorX / 2;
             const midpointY = (maxY - minY) / scaleFactorY / 2;
@@ -202,7 +207,7 @@ function Edge({
                         height: CONTROL_POINT_SIZE,
                         left: controlX - CONTROL_POINT_SIZE / 2,
                         top: controlY - CONTROL_POINT_SIZE / 2,
-                        backgroundColor: theme.graph.edge.circle,
+                        backgroundColor: theme.screenNode,
                     }}
                 ></div>
             )}
@@ -210,7 +215,7 @@ function Edge({
                 <path
                     d={path}
                     fill="none"
-                    stroke={theme.graph.edge.line}
+                    stroke={theme.screenLine}
                     strokeWidth={EDGE_WIDTH}
                 />
             </svg>

@@ -1,8 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { createStyles } from "../../utils/theme-utils";
+import { useEffect, useRef } from "react";
 import { Grid } from "../graph/grid";
 import {
-    Sample,
     SampleType,
     WaveData,
     WaveEditorWaveType,
@@ -11,13 +9,6 @@ import {
 import { useContainerDimensions } from "../../utils/custom-hooks";
 import { Canvas } from "./editor-canvas";
 import { snapTo } from "../../utils/utils-fns";
-import { cn } from "../../utils/style-utils";
-
-const useStyles = createStyles((theme) => ({
-    graph: {
-        backgroundColor: theme.graph.bg,
-    },
-}));
 
 function getYFromSample(sample: SampleType, phase: number) {
     switch (sample) {
@@ -39,20 +30,19 @@ type WaveEditorProps = {
     gridSizeY: number;
     onChange: (data: WaveData) => void;
     data: WaveData;
+    waveType: WaveEditorWaveType;
 };
 
 export function WaveEditor({
     gridSizeX,
     gridSizeY,
     data,
+    waveType,
     onChange,
 }: WaveEditorProps) {
-    const styles = useStyles();
     const editorRef = useRef<HTMLDivElement>(null);
     const dimensions = useContainerDimensions(editorRef);
-    const [waveType, setWaveType] = useState<WaveEditorWaveType>(
-        WaveEditorWaveType.FSine
-    );
+
     const currentData = useRef(data);
 
     useEffect(() => {
@@ -124,32 +114,17 @@ export function WaveEditor({
     };
 
     return (
-        <>
-            {Object.values(WaveEditorWaveType).map((type) => (
-                <button
-                    key={type}
-                    onClick={() => setWaveType(type)}
-                    className={cn(
-                        "m-1 px-2 py-1 bg-gray-200 rounded-md",
-                        waveType === type && "bg-gray-400"
-                    )}
-                >
-                    {type}
-                </button>
-            ))}
-            <div
-                onMouseDown={handleMouseDown}
-                ref={editorRef}
-                style={styles.graph}
-                className="w-full h-full relative"
-            >
-                <Grid
-                    gridSizeX={gridSizeX}
-                    gridSizeY={gridSizeY}
-                    dimensions={dimensions}
-                />
-                <Canvas dimensions={dimensions} data={data} />
-            </div>
-        </>
+        <div
+            onMouseDown={handleMouseDown}
+            ref={editorRef}
+            className="h-full relative"
+        >
+            <Grid
+                gridSizeX={gridSizeX}
+                gridSizeY={gridSizeY}
+                dimensions={dimensions}
+            />
+            <Canvas dimensions={dimensions} data={data} />
+        </div>
     );
 }

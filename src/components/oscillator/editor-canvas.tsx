@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { SampleType, WaveData } from "../../utils/synth-utils";
+import { WaveData } from "../../utils/synth-utils";
 import { Dimensions } from "../../utils/typings-utils";
 import { useTheme } from "../../utils/theme-utils";
 
@@ -32,8 +32,10 @@ export function Canvas({ dimensions, data }: EditorCanvasProps) {
 
             context.lineTo(x, y);
         }
-        context.strokeStyle = theme.waveform.line;
+        context.strokeStyle = theme.screenLine;
         context.lineWidth = 8;
+        context.shadowColor = theme.screenLine;
+        context.shadowBlur = 10;
         context.stroke();
     };
 

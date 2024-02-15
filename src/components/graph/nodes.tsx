@@ -8,8 +8,7 @@ const NODE_SIZE = 16;
 
 const useStyles = createStyles((theme) => ({
     node: {
-        backgroundColor: theme.graph.node.bg,
-        borderColor: theme.graph.node.border,
+        backgroundColor: theme.screenNode,
         width: NODE_SIZE,
         height: NODE_SIZE,
     },
@@ -18,7 +17,8 @@ const useStyles = createStyles((theme) => ({
 type NodesProps = {
     nodes: Node[];
     edges: Edge[];
-    gridSize: number;
+    gridSizeX: number;
+    gridSizeY: number;
     dimensions: Dimensions;
     onChange: (node: Node) => void;
     onDelete: (nodeId: Node["id"]) => void;
@@ -30,7 +30,8 @@ export function Nodes({
     showNodes,
     nodes,
     edges,
-    gridSize,
+    gridSizeX,
+    gridSizeY,
     dimensions,
     onChange,
     snapValue,
@@ -42,21 +43,20 @@ export function Nodes({
     if (!showNodes) return null;
 
     const nodeLeft = (node: Node) =>
-        (width / gridSize) * node.x - NODE_SIZE / 2;
+        (width / gridSizeX) * node.x - NODE_SIZE / 2;
     const nodeTop = (node: Node) =>
-        (height / gridSize) * node.y - NODE_SIZE / 2;
+        (height / gridSizeY) * node.y - NODE_SIZE / 2;
 
     const handleMouseDown =
         (node: Node) => (e: React.MouseEvent<HTMLDivElement>) => {
-            if (node.anchor) return;
             const { closestLeftNode, closestRightNode } =
                 getNeighboursFromNodes(node, nodes, edges);
 
             const lowerBound = closestLeftNode?.x ?? 0;
-            const upperBound = closestRightNode?.x ?? gridSize;
+            const upperBound = closestRightNode?.x ?? gridSizeX;
             const handleMouseMove = (e: MouseEvent | React.MouseEvent) => {
-                let x = (e.clientX - left) / (width / gridSize);
-                let y = (e.clientY - top) / (height / gridSize);
+                let x = (e.clientX - left) / (width / gridSizeX);
+                let y = (e.clientY - top) / (height / gridSizeY);
 
                 if (x < lowerBound) {
                     x = lowerBound;
@@ -72,19 +72,22 @@ export function Nodes({
                 if (y < 0) {
                     y = 0;
                 }
-                if (x > gridSize) {
-                    x = gridSize;
+                if (x > gridSizeX) {
+                    x = gridSizeX;
                 }
-                if (y > gridSize) {
-                    y = gridSize;
+                if (y > gridSizeY) {
+                    y = gridSizeY;
                 }
 
                 if (snapValue) {
                     x = snapTo(x, snapValue);
                     y = snapTo(y, snapValue);
                 }
-
-                onChange({ ...node, x, y });
+                onChange({
+                    ...node,
+                    x: node.anchorX ? node.x : x,
+                    y: node.anchorY ? node.y : y,
+                });
             };
             handleMouseMove(e);
 
@@ -95,7 +98,6 @@ export function Nodes({
         };
 
     const handleDeleteNode = (node: Node) => (e: React.MouseEvent) => {
-        if (node.anchor) return;
         e.stopPropagation();
         e.preventDefault();
         onDelete(node.id);

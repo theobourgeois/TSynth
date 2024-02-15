@@ -1,6 +1,7 @@
 export type Node = {
   id: number;
-  anchor?: boolean;
+  anchorX?: boolean;
+  anchorY?: boolean;
   x: number;
   y: number;
 };

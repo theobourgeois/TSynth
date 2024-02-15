@@ -11,11 +11,7 @@ class SampleBuilder {
         this.lfo = lfo;
     }
 
-    _getOscillatorData() {
-        return this.data;
-    }
-
-    withOscillator1(oscillator1) {
+    withOscillator(oscillator1) {
         return this;
     }
 
@@ -28,6 +24,40 @@ class SampleBuilder {
     }
 
     withFilter(filter) {
+        return this;
+    }
+
+    build() {
+        return this.data;
+    }
+}
+
+// apply master effects to both oscillators
+class MasterBuilder {
+    data;
+
+    constructor(length) {
+        this.data = new Float32Array(length);
+    }
+
+    withOscillator1(oscillator1) {
+        for (let i = 0; i < oscillator1.length; i++) {
+            this.data[i] += oscillator1[i];
+        }
+        return this;
+    }
+
+    withOscillator2(oscillator2) {
+        for (let i = 0; i < oscillator2.length; i++) {
+            this.data[i] += oscillator2[i];
+        }
+        return this;
+    }
+
+    withMaster(master) {
+        for (let i = 0; i < this.data.length; i++) {
+            this.data[i] *= master;
+        }
         return this;
     }
 
@@ -53,6 +83,7 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
                 );
                 return;
             }
+            this.master = event.data.master;
             this.oscillator1 = event.data.oscillator1;
             this.oscillator2 = event.data.oscillator2;
             this.filter = event.data.filter;
@@ -72,7 +103,32 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
         const output = outputs[0];
         const sampleRate = SAMPLE_RATE;
 
-        const data = this.oscillator1.wave.data;
+        const processedOsc1Data = new SampleBuilder(
+            this.oscillator1.wave.data,
+            this.lfo
+        )
+            .withOscillator(this.oscillator1)
+            .withEnvelope(this.envelope)
+            .withFilter(this.filter)
+            .build();
+
+        const processedOsc2Data = new SampleBuilder(
+            this.oscillator2.wave.data,
+            this.lfo
+        )
+            .withOscillator(this.oscillator2)
+            .withEnvelope(this.envelope)
+            .withFilter(this.filter)
+            .build();
+
+        // osc1 and osc2 data should be the same length
+        const dataLength = processedOsc1Data.length;
+
+        const masterData = new MasterBuilder(dataLength)
+            .withOscillator1(processedOsc1Data)
+            .withOscillator2(processedOsc2Data)
+            .withMaster(this.master)
+            .build();
 
         for (const frequency of this.frequencies) {
             if (!this.currentSample[frequency]) {
@@ -81,20 +137,14 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
             for (let channel = 0; channel < output.length; ++channel) {
                 const outputChannel = output[channel];
                 // Calculate playback rate factor based on desired frequency and data length
-                const playbackRate = (frequency * data.length) / sampleRate;
+                const playbackRate = (frequency * dataLength) / sampleRate;
                 for (let i = 0; i < outputChannel.length; ++i) {
-                    if (this.currentSample[frequency] >= data.length) {
+                    if (this.currentSample[frequency] >= dataLength) {
                         this.currentSample[frequency] = 0; // Reset to start if we've reached the end of the data
                     }
-                    const processedData = new SampleBuilder(data, this.lfo)
-                        .withOscillator1(this.oscillator1)
-                        .withOscillator2(this.oscillator2)
-                        .withEnvelope(this.envelope)
-                        .withFilter(this.filter);
                     const dataIndex = Math.floor(this.currentSample[frequency]);
-
                     // Use the playback rate to adjust how we increment through the data
-                    outputChannel[i] += processedData[dataIndex];
+                    outputChannel[i] += masterData[dataIndex];
                     this.currentSample[frequency] += playbackRate; // Increment by playback rate
                 }
             }

@@ -5,7 +5,7 @@ export function BlackOutline({ children }: { children: React.ReactNode }) {
 
     return (
         <div
-            className="absolute top-[64px] left-[55px]"
+            className="absolute top-[64px] left-[55px] z-[1000]"
             style={{
                 width: 665,
                 height: 460,
@@ -90,7 +90,7 @@ export function Border({ width, height }: { width: number; height: number }) {
 export function Background() {
     const theme = useTheme();
     const width = 780;
-    const height = 622;
+    const height = 635;
 
     return (
         <svg
@@ -122,7 +122,7 @@ export function Highlight() {
 
     return (
         <svg
-            className="scale-x-110 absolute left-6 bottom-0"
+            className="scale-x-[1.08] absolute left-5 bottom-0"
             width={width}
             height={height}
             viewBox={`0 0 ${width} ${height}`}
@@ -166,7 +166,7 @@ export function Shadow() {
     const theme = useTheme();
     return (
         <svg
-            className="absolute top-0 scale-x-105 left-7"
+            className="absolute top-0 scale-x-[1.08] left-7"
             width="714"
             height="78"
             viewBox="0 0 714 78"

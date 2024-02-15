@@ -1,12 +1,12 @@
 import { Theme, useTheme } from "../../utils/theme-utils";
 
+// might add more status in the future...
 function getIndicatorColor(status: "on" | "off", theme: Theme) {
-    if (status === "on") {
-        return theme.lightOn;
-    }
-
-    if (status === "off") {
-        return theme.lightOff;
+    switch (status) {
+        case "on":
+            return theme.lightOn;
+        case "off":
+            return theme.lightOff;
     }
 }
 

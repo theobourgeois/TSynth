@@ -59,11 +59,18 @@ export type LFO = {
   attachements: LFOAttachement[]
 }
 
+type EnvelopeData = {
+  x: number;
+  y: number;
+  curveX: number;
+  curveY: number;
+}
+
 export type Envelope = {
-  attack: number;
-  decay: number;
-  sustain: number;
-  release: number;
+  attack: EnvelopeData;
+  hold: EnvelopeData;
+  decay: EnvelopeData;
+  release: EnvelopeData;
 };
 
 const initialOsillator1: Oscillator = {
@@ -119,13 +126,34 @@ const initialLFO: LFO = {
 }
 
 const initialEnvelope: Envelope = {
-  attack: 0,
-  decay: 0,
-  sustain: 0,
-  release: 0,
+  attack: {
+    x: 0.1,
+    y: 0,
+    curveX: 0,
+    curveY: 0,
+  },
+  hold: {
+    x: 0.1,
+    y: 0,
+    curveX: 0,
+    curveY: 0,
+  },
+  decay: {
+    x: 0.1,
+    y: 0.4,
+    curveX: 0,
+    curveY: 0,
+  },
+  release: {
+    x: 0.5,
+    y: 0,
+    curveX: 0,
+    curveY: 0,
+  },
 }
 
 export interface SynthState {
+  master: number;
   oscillator1: Oscillator;
   oscillator2: Oscillator;
   filter: Filter;
@@ -134,6 +162,7 @@ export interface SynthState {
 }
 
 export interface SynthStore extends SynthState {
+  setMaster: (master: number) => void;
   setOscillator1: (oscillator: Oscillator) => void;
   setOscillator2: (oscillator: Oscillator) => void;
   setFilter: (filter: Filter) => void;
@@ -142,11 +171,13 @@ export interface SynthStore extends SynthState {
 }
 
 const useSynthStore = create<SynthStore>((set) => ({
+  master: 0.5,
   oscillator1: initialOsillator1,
   oscillator2: initialOsillator2,
   filter: initialFilter,
   LFO: initialLFO,
   envelope: initialEnvelope,
+  setMaster: (master: number) => set({ master }),
   setOscillator1: (oscillator: Oscillator) => set({ oscillator1: oscillator }),
   setOscillator2: (oscillator: Oscillator) => set({ oscillator2: oscillator }),
   setFilter: (filter: Filter) => set({ filter: filter }),
@@ -168,22 +199,33 @@ export enum WaveEditorWaveType {
   Sawtooth = "sawtooth",
   FSawtooth = "fsawtooth",
   Noise = "noise",
-  Line = "line",
 }
 
+/**
+ * Get the sample data from the wave type. 
+ * Used to draw the wave in the WaveEditor, depending on what type of wave is selected
+ * @param type The type of wave
+ * @param gridSizeY The number of grid lines in the Y axis
+ * @param snapY The Y coordinate, snapped to the grid 
+ * @returns 
+ */
 export function getSampleDataFromType(
   type: WaveEditorWaveType,
   gridSizeY: number,
   snapY: number,
 ) {
+  // when the y is at the bottom of the grid, set the amplitude to 0
+  // this will result in a flat line at the bottom of the grid
   const amplitude = snapY === -1 ? 0 : (1 / gridSizeY) * 2
+  const positiveWaveOffset = snapY - (1 / gridSizeY) * 2
+
   switch (type) {
     case WaveEditorWaveType.Sine:
       return {
         type: SampleType.Sine,
         amplitude: -amplitude,
         noise: 0,
-        offset: snapY - (1 / gridSizeY) * 2,
+        offset: positiveWaveOffset,
         period: 1,
       };
     case WaveEditorWaveType.FSine:
@@ -207,7 +249,7 @@ export function getSampleDataFromType(
         type: SampleType.Triangle,
         amplitude: -amplitude,
         noise: 0,
-        offset: snapY - (1 / gridSizeY) * 2,
+        offset: positiveWaveOffset,
         period: 1,
       };
     case WaveEditorWaveType.FTriangle:
@@ -223,7 +265,7 @@ export function getSampleDataFromType(
         type: SampleType.Sawtooth,
         amplitude: -amplitude,
         noise: 0,
-        offset: snapY - (1 / gridSizeY) * 2,
+        offset: positiveWaveOffset,
         period: 1,
       };
     case WaveEditorWaveType.FSawtooth:
@@ -234,13 +276,5 @@ export function getSampleDataFromType(
         offset: snapY,
         period: 1,
       };
-    // case WaveEditorWaveType.Noise:
-    //   const noiseLevel = 1 - Math.abs(y);
-    //   return {
-    //     ...currentSample,
-    //     noise: noiseLevel,
-    //   };
-    // default:
-    //   return currentSample;
   }
 }

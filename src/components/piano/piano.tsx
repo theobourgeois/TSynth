@@ -36,5 +36,5 @@ export function Piano() {
         };
     }, []);
 
-    return <>Piano</>;
+    return <></>;
 }

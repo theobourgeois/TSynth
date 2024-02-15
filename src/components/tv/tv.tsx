@@ -1,4 +1,6 @@
 import { Screens, useScreen } from "../../utils/screens-utils";
+import { KnobText } from "../knob/knob-text";
+import { MasterKnob } from "../knob/master-knob";
 import { ScreenButton } from "./screen-button";
 import {
     Background,
@@ -18,7 +20,7 @@ export function TV({ children }: { children: React.ReactNode }) {
                 width: TV_WIDTH,
                 height: TV_HEIGHT,
             }}
-            className="relative"
+            className="relative select-none"
         >
             <div className="absolute">
                 <Background />
@@ -49,15 +51,22 @@ function ScreenButtons() {
     };
 
     return (
-        <div className="absolute bottom-4 left-12 flex gap-4 p-2 z-[100]">
-            {Object.values(Screens).map((screen) => (
-                <ScreenButton
-                    isActiveScreen={screen === activeScreen}
-                    key={screen}
-                    screen={screen}
-                    onClick={handleChangeScreen(screen)}
-                ></ScreenButton>
-            ))}
+        <div className="absolute bottom-4 flex w-full justify-between left-12 p-2 z-[100]">
+            <div className="flex gap-4">
+                {Object.values(Screens).map((screen) => (
+                    <ScreenButton
+                        isActiveScreen={screen === activeScreen}
+                        key={screen}
+                        screen={screen}
+                        onClick={handleChangeScreen(screen)}
+                    ></ScreenButton>
+                ))}
+            </div>
+            <div className="relative">
+                <div className="absolute right-28 top-3">
+                    <MasterKnob />
+                </div>
+            </div>
         </div>
     );
 }

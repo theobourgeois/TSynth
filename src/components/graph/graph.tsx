@@ -1,7 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { createStyles } from "../../utils/theme-utils";
+import { useRef } from "react";
 import { Grid } from "./grid";
-import { Dimensions } from "../../utils/typings-utils";
 import { Nodes } from "./nodes";
 import { Edges } from "./edges";
 import { getNewID, snapTo } from "../../utils/utils-fns";
@@ -18,27 +16,22 @@ type GraphProps = {
     showNodes?: boolean;
     snapValue?: number;
     data: GraphData;
-    gridSize?: number;
+    gridSizeX?: number;
+    gridSizeY?: number;
     canAddNodes?: boolean;
     onChange?: (data: GraphData) => void;
 };
 
-const useStyles = createStyles((theme) => ({
-    graph: {
-        backgroundColor: theme.graph.bg,
-    },
-}));
-
 export function Graph({
     showGrid = false,
     showNodes = false,
-    gridSize = 8,
+    gridSizeX = 8,
+    gridSizeY = 8,
     data,
     canAddNodes = false,
     onChange,
     snapValue,
 }: GraphProps) {
-    const styles = useStyles();
     const graphRef = useRef<HTMLDivElement>(null);
     const dimensions = useContainerDimensions(graphRef);
 
@@ -67,8 +60,10 @@ export function Graph({
         if (!canAddNodes || !onChange) {
             return;
         }
-        const x = (e.clientX - dimensions.left) / (dimensions.width / gridSize);
-        const y = (e.clientY - dimensions.top) / (dimensions.height / gridSize);
+        const x =
+            (e.clientX - dimensions.left) / (dimensions.width / gridSizeX);
+        const y =
+            (e.clientY - dimensions.top) / (dimensions.height / gridSizeY);
 
         const newNode: Node = {
             id: getNewID(),
@@ -178,7 +173,7 @@ export function Graph({
     };
 
     return (
-        <div ref={graphRef} style={styles.graph} className="w-full h-full">
+        <div ref={graphRef} className="w-full h-full">
             <div
                 className="relative w-full h-full"
                 onDoubleClick={handleAddNode}
@@ -186,17 +181,18 @@ export function Graph({
                 <Grid
                     dimensions={dimensions}
                     showGrid={showGrid}
-                    gridSizeX={gridSize}
-                    gridSizeY={gridSize}
+                    gridSizeX={gridSizeX}
+                    gridSizeY={gridSizeY}
                 />
                 <Nodes
                     showNodes={showNodes}
                     onChange={handleChangeNode}
                     onDelete={handleDeleteNode}
                     dimensions={dimensions}
+                    gridSizeX={gridSizeX}
+                    gridSizeY={gridSizeY}
                     nodes={data?.nodes ?? []}
                     edges={data?.edges ?? []}
-                    gridSize={gridSize}
                     snapValue={snapValue}
                 />
                 <Edges
@@ -205,7 +201,8 @@ export function Graph({
                     onChange={handleChangeEdge}
                     dimensions={dimensions}
                     edges={data?.edges ?? []}
-                    gridSize={gridSize}
+                    gridSizeX={gridSizeX}
+                    gridSizeY={gridSizeY}
                     nodes={data?.nodes ?? []}
                 />
             </div>
