@@ -133,7 +133,7 @@ const initialEnvelope: Envelope = {
     curveY: 0,
   },
   hold: {
-    x: 0.1,
+    x: 0,
     y: 0,
     curveX: 0,
     curveY: 0,
@@ -171,7 +171,7 @@ export interface SynthStore extends SynthState {
 }
 
 const useSynthStore = create<SynthStore>((set) => ({
-  master: 0.5,
+  master: 0.1,
   oscillator1: initialOsillator1,
   oscillator2: initialOsillator2,
   filter: initialFilter,
@@ -276,5 +276,104 @@ export function getSampleDataFromType(
         offset: snapY,
         period: 1,
       };
+  }
+}
+
+/**
+ * get level of audio in Db from normalized level
+ * @param normalizedLevel value from 0 to 1
+ */
+export function getDenormalizedAudioLevel(normalizedLevel: number) {
+  const minDb = -60;
+  const maxDb = 0;
+
+  const minLevel = Math.pow(10, minDb / 20);
+  const maxLevel = Math.pow(10, maxDb / 20);
+
+  const level = minLevel + (maxLevel - minLevel) * normalizedLevel;
+  const decibels = 20 * Math.log10(level);
+  return decibels
+}
+
+/**
+ * Get time in ms from normalized time. 
+ * Used for time in the envelope
+ * @param normalizedMs value from 0 to 1
+ * @returns time in ms
+ */
+export function getDenormalizedMs(normalizedMs: number) {
+  const minMs = 0.01;
+  const maxMs = 3000;
+
+  return minMs + (maxMs - minMs) * normalizedMs;
+}
+
+/**
+ * get unison from denormalized value
+ * @param normalizedUnison number from 0 to 1 
+ * @returns 
+ */
+export function getDenormalizedUnison(normalizedUnison: number) {
+  return Math.floor(normalizedUnison * 16);
+}
+
+export function denormalizeEnvelope(envelope: Envelope) {
+  const attack = {
+    ...envelope.attack,
+    x: getDenormalizedMs(envelope.attack.x),
+  }
+
+  const hold = {
+    ...envelope.hold,
+    x: getDenormalizedMs(envelope.hold.x),
+  }
+
+  const decay = {
+    ...envelope.decay,
+    x: getDenormalizedMs(envelope.decay.x),
+  }
+
+  const release = {
+    ...envelope.release,
+    x: getDenormalizedMs(envelope.release.x),
+  }
+
+  return {
+    attack,
+    hold,
+    decay,
+    release,
+  }
+}
+
+function getDenormalizedOscillator(oscillator: Oscillator) {
+  const detune = oscillator.detune * 100;
+  const pan = oscillator.pan * 100;
+  const unison = Math.floor(oscillator.unison * 16);
+
+  return {
+    ...oscillator,
+    detune,
+    pan,
+    unison,
+  }
+}
+
+/**
+ * each value in the synth state is normalized between 0 and 1 for easier processing
+ * this function converts the normalized values to their correct value units
+ * @param synth 
+ * @returns synth with correct values
+ */
+export function denormalizeSynthValues(synth: SynthState) {
+  const envelope = denormalizeEnvelope(synth.envelope);
+  const oscillator1 = getDenormalizedOscillator(synth.oscillator1);
+  const oscillator2 = getDenormalizedOscillator(synth.oscillator2);
+
+  return {
+    ...synth,
+    envelope,
+    oscillator1,
+    oscillator2,
   }
 }

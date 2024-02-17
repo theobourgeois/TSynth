@@ -1,73 +1,8 @@
-import { useState } from "react";
-import { GraphData } from "../../utils/graph-utils";
+import { GraphData, getOrderedNodes } from "../../utils/graph-utils";
 import { Envelope, useSynth } from "../../utils/synth-utils";
 import { Graph } from "../graph/graph";
 
 const ENVELOPE_GRID_SIZE = { x: 4, y: 8 };
-
-const DEFAULT_ENVELOPE_GRAPH_DATA: GraphData = {
-    nodes: [
-        // attack
-        {
-            id: 1,
-            x: 0,
-            y: 8,
-            anchorX: true,
-            anchorY: true,
-        },
-        // decay
-        {
-            id: 2,
-            x: 0.5,
-            y: 0,
-            anchorY: true,
-        },
-        // release
-        {
-            id: 3,
-            x: 2,
-            y: 0,
-        },
-        // end
-        {
-            id: 4,
-            x: 4,
-            y: 8,
-            anchorY: true,
-        },
-    ],
-    edges: [
-        // attack -> decay
-        {
-            id: 1,
-            source: 1,
-            target: 2,
-            curveX: 0,
-            curveY: 0,
-        },
-        // decay -> sustain
-        {
-            id: 2,
-            source: 2,
-            target: 3,
-            curveX: 0,
-            curveY: 0,
-        },
-        // release -> end
-        {
-            id: 4,
-            source: 3,
-            target: 4,
-            curveX: 0,
-            curveY: 0,
-        },
-    ],
-};
-
-const getEnvelopeFromGraphData = (
-    data: GraphData,
-    gridSize = ENVELOPE_GRID_SIZE
-) => {};
 
 const getGraphDataFromEnvelope = (
     envelope: Envelope,
@@ -106,7 +41,6 @@ const getGraphDataFromEnvelope = (
         id: 4,
         x: decayX * gridSize.x,
         y: envelope.decay.y * gridSize.y,
-        anchorY: true,
     };
 
     const releaseNode = {
@@ -160,14 +94,82 @@ const getGraphDataFromEnvelope = (
     return { nodes, edges };
 };
 
-export function EnvelopeGraph() {
-    const { envelope, setEnvelope } = useSynth();
-    const [envelopeGraphData, setEnvelopeGraphData] = useState<GraphData>(
-        DEFAULT_ENVELOPE_GRAPH_DATA
+const getEnvelopeFromGraphData = (
+    data: GraphData,
+    gridSize = ENVELOPE_GRID_SIZE
+) => {
+    const orderedNodes = getOrderedNodes(data.nodes, data.edges);
+
+    const attackNode = orderedNodes[1];
+    const holdNode = orderedNodes[2];
+    const decayNode = orderedNodes[3];
+    const releaseNode = orderedNodes[4];
+
+    const startToAttackEdge = data.edges.find(
+        (edge) => edge.source === 1 && edge.target === attackNode.id
+    );
+    const holdToDecayEdge = data.edges.find(
+        (edge) => edge.source === holdNode.id && edge.target === decayNode.id
+    );
+    const decayToReleaseEdge = data.edges.find(
+        (edge) => edge.source === decayNode.id && edge.target === releaseNode.id
     );
 
+    if (!holdToDecayEdge || !decayToReleaseEdge || !startToAttackEdge) {
+        return;
+    }
+
+    const attackX = attackNode.x;
+    const holdX = holdNode.x - attackX;
+    const decayX = decayNode.x - holdNode.x;
+    const decayY = decayNode.y;
+    const releaseX = releaseNode.x - decayNode.x;
+
+    const attack = {
+        x: attackX / gridSize.x,
+        y: 0,
+        curveX: startToAttackEdge.curveX / gridSize.x,
+        curveY: startToAttackEdge.curveY / gridSize.y,
+    };
+
+    const hold = {
+        x: holdX / gridSize.x,
+        y: 0,
+        curveX: 0,
+        curveY: 0,
+    };
+
+    const decay = {
+        x: decayX / gridSize.x,
+        y: decayY / gridSize.y,
+        curveX: holdToDecayEdge.curveX / gridSize.x,
+        curveY: holdToDecayEdge.curveY / gridSize.y,
+    };
+
+    const release = {
+        x: releaseX / gridSize.x,
+        y: 0,
+        curveX: decayToReleaseEdge.curveX / gridSize.x,
+        curveY: decayToReleaseEdge.curveY / gridSize.y,
+    };
+
+    return {
+        attack,
+        hold,
+        decay,
+        release,
+    };
+};
+
+export function EnvelopeGraph() {
+    const { envelope, setEnvelope } = useSynth();
+
     const handleChangeGraphData = (data: GraphData) => {
-        setEnvelopeGraphData(data);
+        const envelope = getEnvelopeFromGraphData(data);
+        if (!envelope) {
+            return;
+        }
+        setEnvelope(envelope);
     };
 
     const graphData = getGraphDataFromEnvelope(envelope);

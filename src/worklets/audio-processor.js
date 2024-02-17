@@ -1,25 +1,35 @@
+// Generator for unique IDs
+function* idGenerator() {
+    let id = 0;
+    while (true) {
+        yield ++id;
+    }
+}
+const idGen = idGenerator();
+export const getNewID = () => idGen.next().value;
+
 const SAMPLE_RATE = 44100;
 
-// create a sample. Builder returns array of data with applied effects
-class SampleBuilder {
+// build the oscillator with effects
+class OscillatorBuilder {
+    data;
     /**
      * @param {Float32Array} data unprocessed audio data
      * @param lfo used to apply effects to the builder components
      */
-    constructor(data, lfo) {
-        this.data = data;
+    constructor(lfo) {
         this.lfo = lfo;
     }
 
-    withOscillator(oscillator1) {
-        return this;
-    }
+    withOscillator(oscillator) {
+        this.data = new Float32Array(oscillator.wave.data.length);
+        if (!oscillator.enabled) {
+            return this;
+        }
 
-    withOscillator2(oscillator1) {
-        return this;
-    }
-
-    withEnvelope(envelope) {
+        for (let i = 0; i < oscillator.wave.data.length; i++) {
+            this.data[i] = oscillator.wave.data[i];
+        }
         return this;
     }
 
@@ -70,25 +80,63 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
         this.phase = 0;
-        this.currentSample = {};
+        this.timeOfRelease = null;
+        this.levelToRelease = 0;
         this.frequencies = [];
         this.port.onmessage = (event) => {
             if (event.data.addFrequency) {
-                this.frequencies.push(event.data.addFrequency);
+                const newFrequency = {
+                    remove: false,
+                    id: getNewID(),
+                    frequency: event.data.addFrequency,
+                    currentSample: 0,
+                };
+                this.currentTime = new Date().getTime();
+
+                // when you play a note while releasing other note(s), the new note should override the old ones
+                if (this.timeOfRelease !== null) {
+                    this.timeOfRelease = null;
+                    this.frequencies = [newFrequency];
+                    return;
+                }
+                this.frequencies.push(newFrequency);
                 return;
             }
+
             if (event.data.removeFrequency) {
-                this.frequencies = this.frequencies.filter(
-                    (frequency) => frequency !== event.data.removeFrequency
+                this.timeOfRelease = new Date().getTime();
+                const frequencyIndex = this.frequencies.findIndex(
+                    (f) => f.frequency === event.data.removeFrequency
                 );
+
+                if (frequencyIndex !== -1) {
+                    this.frequencies[frequencyIndex].remove = true;
+                }
                 return;
             }
+
             this.master = event.data.master;
-            this.oscillator1 = event.data.oscillator1;
-            this.oscillator2 = event.data.oscillator2;
-            this.filter = event.data.filter;
             this.envelope = event.data.envelope;
             this.lfo = event.data.LFO;
+            const oscillator1 = event.data.oscillator1;
+            const oscillator2 = event.data.oscillator2;
+            const filter = event.data.filter;
+
+            const processedOsc1Data = new OscillatorBuilder(this.lfo)
+                .withOscillator(oscillator1)
+                .withFilter(filter)
+                .build();
+
+            const processedOsc2Data = new OscillatorBuilder(this.lfo)
+                .withOscillator(oscillator2)
+                .withFilter(filter)
+                .build();
+
+            this.data = new MasterBuilder(processedOsc1Data.length)
+                .withOscillator1(processedOsc1Data)
+                .withOscillator2(processedOsc2Data)
+                .withMaster(this.master)
+                .build();
         };
     }
 
@@ -103,50 +151,78 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
         const output = outputs[0];
         const sampleRate = SAMPLE_RATE;
 
-        const processedOsc1Data = new SampleBuilder(
-            this.oscillator1.wave.data,
-            this.lfo
-        )
-            .withOscillator(this.oscillator1)
-            .withEnvelope(this.envelope)
-            .withFilter(this.filter)
-            .build();
+        const dataLength = this.data.length;
 
-        const processedOsc2Data = new SampleBuilder(
-            this.oscillator2.wave.data,
-            this.lfo
-        )
-            .withOscillator(this.oscillator2)
-            .withEnvelope(this.envelope)
-            .withFilter(this.filter)
-            .build();
+        if (this.frequencies.length === 0) {
+            return true;
+        }
 
-        // osc1 and osc2 data should be the same length
-        const dataLength = processedOsc1Data.length;
-
-        const masterData = new MasterBuilder(dataLength)
-            .withOscillator1(processedOsc1Data)
-            .withOscillator2(processedOsc2Data)
-            .withMaster(this.master)
-            .build();
-
-        for (const frequency of this.frequencies) {
-            if (!this.currentSample[frequency]) {
-                this.currentSample[frequency] = 0;
+        for (let f = 0; f < this.frequencies.length; ++f) {
+            const frequency = this.frequencies[f].frequency;
+            if (!this.frequencies[f].currentSample) {
+                this.frequencies[f].currentSample = 0;
             }
             for (let channel = 0; channel < output.length; ++channel) {
                 const outputChannel = output[channel];
                 // Calculate playback rate factor based on desired frequency and data length
                 const playbackRate = (frequency * dataLength) / sampleRate;
                 for (let i = 0; i < outputChannel.length; ++i) {
-                    if (this.currentSample[frequency] >= dataLength) {
-                        this.currentSample[frequency] = 0; // Reset to start if we've reached the end of the data
+                    const currentSample = this.frequencies[f].currentSample;
+                    if (currentSample >= dataLength) {
+                        this.frequencies[f].currentSample = 0;
                     }
-                    const dataIndex = Math.floor(this.currentSample[frequency]);
-                    // Use the playback rate to adjust how we increment through the data
-                    outputChannel[i] += masterData[dataIndex];
-                    this.currentSample[frequency] += playbackRate; // Increment by playback rate
+
+                    const dataIndex = Math.floor(
+                        this.frequencies[f].currentSample
+                    );
+
+                    outputChannel[i] += this.data[dataIndex];
+                    this.frequencies[f].currentSample += playbackRate; // Increment by playback rate
                 }
+            }
+        }
+
+        // apply envelope
+        for (let channel = 0; channel < output.length; ++channel) {
+            const outputChannel = output[channel];
+            for (let i = 0; i < outputChannel.length; ++i) {
+                const attackTime = this.envelope.attack.x;
+                const holdTime = this.envelope.hold.x + attackTime;
+                const decayTime = this.envelope.decay.x + holdTime;
+                const sustain = this.envelope.decay.y;
+                const releaseTime = this.envelope.release.x;
+
+                const hasReleased = this.timeOfRelease !== null;
+                if (hasReleased) {
+                    const timeSinceRelease =
+                        new Date().getTime() - this.timeOfRelease;
+                    const releaseWeight = Math.max(
+                        1 - timeSinceRelease / releaseTime,
+                        0
+                    );
+
+                    outputChannel[i] *= releaseWeight * this.levelToRelease;
+
+                    // when the release is done, remove the frequency
+                    // this is done as a cleanup.
+                    // The frequency should still be removed from the list when you play another notes
+                    if (releaseWeight === 0) {
+                        this.frequencies = [];
+                    }
+                    continue;
+                }
+
+                const timeSinceStart = new Date().getTime() - this.currentTime;
+                const attackWeight = Math.min(timeSinceStart / attackTime, 1);
+
+                let decaySustainWeight = 1;
+                if (timeSinceStart > decayTime) {
+                    decaySustainWeight =
+                        Math.min(timeSinceStart / decayTime, 1) * sustain;
+                }
+
+                outputChannel[i] *= attackWeight * decaySustainWeight;
+                this.levelToRelease = outputChannel[i];
             }
         }
 

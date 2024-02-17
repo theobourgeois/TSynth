@@ -1,5 +1,9 @@
 import { useEffect } from "react";
-import { useSynth } from "../../utils/synth-utils";
+import {
+    SynthState,
+    denormalizeSynthValues,
+    useSynth,
+} from "../../utils/synth-utils";
 import { audioProcessor } from "../../utils/audio-processing";
 import { createStyles } from "../../utils/theme-utils";
 import { TV } from "../tv/tv";
@@ -25,14 +29,14 @@ export function Synth() {
     useEffect(() => {
         const { master, oscillator1, oscillator2, envelope, LFO, filter } =
             synth;
-        const payload = {
+        const payload = denormalizeSynthValues({
             master,
             oscillator1,
             oscillator2,
             envelope,
             LFO,
             filter,
-        };
+        });
         audioProcessor.setProcessorData(payload);
     }, [synth]);
 

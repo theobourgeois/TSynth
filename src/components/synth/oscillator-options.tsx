@@ -1,4 +1,8 @@
-import { Oscillator } from "../../utils/synth-utils";
+import {
+    Oscillator,
+    getDenormalizedAudioLevel,
+    getDenormalizedUnison,
+} from "../../utils/synth-utils";
 import { KnobText } from "../knob/knob-text";
 import { OptionWrapper } from "./border";
 
@@ -33,6 +37,9 @@ export function OscillatorOptions({
                     title="UNISON"
                     value={oscillator.unison}
                     onChange={handleChangeOscillator("unison")}
+                    indicatorText={(value) =>
+                        getDenormalizedUnison(value).toFixed(0)
+                    }
                 />
                 <KnobText
                     title="DETUNE"
@@ -43,6 +50,9 @@ export function OscillatorOptions({
                     title="LEVEL"
                     value={oscillator.level}
                     onChange={handleChangeOscillator("level")}
+                    indicatorText={(value) =>
+                        getDenormalizedAudioLevel(value).toFixed(0) + " Db"
+                    }
                 />
                 <KnobText
                     title="PAN"

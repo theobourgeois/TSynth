@@ -25,7 +25,7 @@ export type GraphData = {
  * @param edges list of edges
  * @returns ordered list of nodes based on the edges
  */
-function getOrderedNodes(nodes: Node[], edges: Edge[]) {
+export function getOrderedNodes(nodes: Node[], edges: Edge[]) {
   const orderedNodes: Node[] = [];
 
   // find the leftmost node
