@@ -32,7 +32,7 @@ export function OscillatorOptions({
             enabled={oscillator.enabled}
             title={`OSC ${oscillatorNumber}`}
         >
-            <div className="gap-8 grid grid-cols-2">
+            <div className="gap-4 grid grid-cols-2">
                 <KnobText
                     title="UNISON"
                     value={oscillator.unison}

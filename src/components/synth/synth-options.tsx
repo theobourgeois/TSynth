@@ -21,11 +21,11 @@ export function SynthOptions() {
                 />
             </div>
             <div className="flex gap-4">
-                <EnvelopeOptions />
+                <FilterOptions />
                 <LFOOptions />
             </div>
             <div>
-                <FilterOptions />
+                <EnvelopeOptions />
             </div>
         </div>
     );

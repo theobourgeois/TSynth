@@ -41,7 +41,7 @@ export function EnvelopeOptions() {
 
     return (
         <OptionWrapper title="ENVELOPE">
-            <div className="flex gap-8">
+            <div className="flex gap-9">
                 <KnobText
                     title="ATT"
                     value={envelope.attack.x}
@@ -64,7 +64,7 @@ export function EnvelopeOptions() {
                     onChange={handleChangeEnvelope("decay")}
                 />
                 <KnobText
-                    title="SUS"
+                    title="SUSTAIN"
                     value={envelope.decay.y}
                     onChange={handleChangeEnvelopeSustain}
                     indicatorText={(value) =>

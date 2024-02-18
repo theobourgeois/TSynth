@@ -139,8 +139,8 @@ const initialEnvelope: Envelope = {
     curveY: 0,
   },
   decay: {
-    x: 0.1,
-    y: 0.4,
+    x: 0,
+    y: 0,
     curveX: 0,
     curveY: 0,
   },

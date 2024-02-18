@@ -73,7 +73,7 @@ const getGraphDataFromEnvelope = (
         source: 3,
         target: 4,
         curveX: envelope.decay.curveX * gridSize.x,
-        curveY: envelope.decay.curveY * gridSize.y,
+        curveY: (1 - envelope.decay.curveY) * gridSize.y,
     };
 
     const decayToReleaseEdge = {
@@ -141,7 +141,7 @@ const getEnvelopeFromGraphData = (
 
     const decay = {
         x: decayX / gridSize.x,
-        y: decayY / gridSize.y,
+        y: 1 - decayY / gridSize.y,
         curveX: holdToDecayEdge.curveX / gridSize.x,
         curveY: holdToDecayEdge.curveY / gridSize.y,
     };
