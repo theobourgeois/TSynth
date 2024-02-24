@@ -43,7 +43,7 @@ export function Synth() {
     return (
         <div style={styles.synth} className="rounded-md p-4 drop-shadow-md">
             <div className="flex h-full gap-2">
-                <div>
+                <div className="">
                     <div className="flex justify-between">
                         <Logo />
                     </div>

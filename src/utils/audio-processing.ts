@@ -50,6 +50,10 @@ export class AudioProcessor {
     this.audioProcessingNode = new AudioWorkletNode(
       this.audioContext,
       "audio-processor",
+      {
+        numberOfOutputs: 1,
+        outputChannelCount: [2],
+      }
     );
     this.startAudioProcessor()
   }

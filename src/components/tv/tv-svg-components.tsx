@@ -5,7 +5,7 @@ export function BlackOutline({ children }: { children: React.ReactNode }) {
 
     return (
         <div
-            className="absolute top-[64px] left-[55px] z-[1000]"
+            className="absolute z-10 top-[64px] left-[55px]"
             style={{
                 width: 665,
                 height: 460,
@@ -13,7 +13,7 @@ export function BlackOutline({ children }: { children: React.ReactNode }) {
                 borderRadius: 11,
             }}
         >
-            {children}
+            <div className="w-full h-full absolute z-0">{children}</div>
         </div>
     );
 }

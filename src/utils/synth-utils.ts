@@ -7,14 +7,7 @@ export enum SampleType {
   Triangle = "triangle",
 }
 
-export type Sample = {
-  type: SampleType;
-  period: number; // in samples
-  amplitude: number; // -1 to 1
-  offset: number; // -1 to 1
-  noise: number; // 0 to 1
-}
-
+// data is an array of number from 0 to 1
 export type WaveData = number[]
 
 export type Wave = {
@@ -73,10 +66,14 @@ export type Envelope = {
   release: EnvelopeData;
 };
 
+/**
+ * initial values for the synth state
+ */
+
 const initialOsillator1: Oscillator = {
   enabled: true,
   wave: {
-    data: Array.from({ length: 512 }, (_, i) => Math.sin(i / 30)),
+    data: Array.from({ length: 1024 }, (_, i) => Math.sin(i / 164)),
     octave: 0,
     semitone: 0,
     fine: 0,
@@ -86,14 +83,14 @@ const initialOsillator1: Oscillator = {
   fine: 0,
   unison: 0,
   detune: 0,
-  pan: 0,
-  level: 0,
+  pan: 0.5,
+  level: 1,
 }
 
 const initialOsillator2: Oscillator = {
   enabled: false,
   wave: {
-    data: Array.from({ length: 512 }, (_, i) => Math.sin(i / 30)),
+    data: Array.from({ length: 1024 }, (_, i) => Math.sin(i / 164)),
     octave: 0,
     semitone: 0,
     fine: 0,
@@ -103,8 +100,8 @@ const initialOsillator2: Oscillator = {
   fine: 0,
   unison: 0,
   detune: 0,
-  pan: 0,
-  level: 0,
+  pan: 0.5,
+  level: 1,
 }
 
 const initialFilter: Filter = {
@@ -127,20 +124,20 @@ const initialLFO: LFO = {
 
 const initialEnvelope: Envelope = {
   attack: {
-    x: 0.1,
+    x: 0,
     y: 0,
     curveX: 0,
     curveY: 0,
   },
   hold: {
-    x: 0,
+    x: 0.1,
     y: 0,
     curveX: 0,
     curveY: 0,
   },
   decay: {
-    x: 0,
-    y: 0,
+    x: 0.3,
+    y: 0.7,
     curveX: 0,
     curveY: 0,
   },
@@ -314,7 +311,7 @@ export function getDenormalizedMs(normalizedMs: number) {
  * @returns 
  */
 export function getDenormalizedUnison(normalizedUnison: number) {
-  return Math.floor(normalizedUnison * 16);
+  return Math.floor(normalizedUnison * 15) + 1;
 }
 
 export function denormalizeEnvelope(envelope: Envelope) {
@@ -331,6 +328,7 @@ export function denormalizeEnvelope(envelope: Envelope) {
   const decay = {
     ...envelope.decay,
     x: getDenormalizedMs(envelope.decay.x),
+    y: 1 - envelope.decay.y,
   }
 
   const release = {
@@ -348,8 +346,8 @@ export function denormalizeEnvelope(envelope: Envelope) {
 
 function getDenormalizedOscillator(oscillator: Oscillator) {
   const detune = oscillator.detune * 100;
-  const pan = oscillator.pan * 100;
-  const unison = Math.floor(oscillator.unison * 16);
+  const pan = oscillator.pan * 2 - 1;
+  const unison = getDenormalizedUnison(oscillator.unison)
 
   return {
     ...oscillator,

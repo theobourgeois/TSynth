@@ -12,6 +12,7 @@ const useStyles = createStyles((theme) => ({
         height: "100%",
         padding: "0.7rem",
         background: `linear-gradient(0deg, ${theme.screenPrimary} 0%, ${theme.screenShine} 75%, ${theme.screenPrimary} 100%)`,
+        overflow: "hidden",
     },
 }));
 

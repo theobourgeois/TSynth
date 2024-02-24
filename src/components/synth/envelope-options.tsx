@@ -61,6 +61,9 @@ export function EnvelopeOptions() {
                 <KnobText
                     title="DECAY"
                     value={envelope.decay.x}
+                    indicatorText={(value) =>
+                        getDenormalizedMs(value).toFixed(0) + " MS"
+                    }
                     onChange={handleChangeEnvelope("decay")}
                 />
                 <KnobText
@@ -68,7 +71,7 @@ export function EnvelopeOptions() {
                     value={envelope.decay.y}
                     onChange={handleChangeEnvelopeSustain}
                     indicatorText={(value) =>
-                        getDenormalizedAudioLevel(value).toFixed(0) + " Db"
+                        getDenormalizedAudioLevel(1 - value).toFixed(0) + " Db"
                     }
                 />
                 <KnobText

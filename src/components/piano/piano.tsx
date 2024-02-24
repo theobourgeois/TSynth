@@ -4,10 +4,10 @@ import { audioProcessor } from "../../utils/audio-processing";
 
 export function Piano() {
     useEffect(() => {
-        const keysCurrentlyPressed = {};
+        const keysCurrentlyPressed: { [key in string]: boolean } = {};
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            const key = e.key;
+            const key = e.key.toLowerCase();
             // Check if the key is already pressed and ignore if it is
             if (keysCurrentlyPressed[key]) {
                 return;
@@ -21,7 +21,7 @@ export function Piano() {
         };
 
         const handleKeyUp = (e: KeyboardEvent) => {
-            const key = e.key;
+            const key = e.key.toLowerCase();
             keysCurrentlyPressed[key] = false;
             const freq = keyToNoteMap[key];
             audioProcessor.stop(freq);

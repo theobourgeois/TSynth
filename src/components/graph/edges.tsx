@@ -149,6 +149,12 @@ function Edge({
 
     const path = `M ${sourceX} ${sourceY} C ${controlX} ${controlY} ${controlX} ${controlY} ${targetX} ${targetY}`;
 
+    const viewBox = `0 0 ${width} ${height}`;
+
+    // control points but they are rendered on the edge
+    const controlXOnLine = controlX;
+    const controlYOnLine = controlY;
+
     // change the curve value when dragging the control point
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         const handleMouseMove = (e: MouseEvent | React.MouseEvent) => {
@@ -158,11 +164,21 @@ function Edge({
             const scaleFactorX = width / gridSizeX;
             const scaleFactorY = height / gridSizeY;
 
+            // curveX and curveY cant be bigger than its bounding box
+            const curveXBoundingBox = targetNode.x - sourceNode.x;
+            const curveYBoundingBox = targetNode.y - sourceNode.y;
+
             const midpointX = (maxX - minX) / scaleFactorX / 2;
             const midpointY = (maxY - minY) / scaleFactorY / 2;
 
-            const unBoundCurveX = x / scaleFactorX - midpointX;
-            const unBoundCurveY = y / scaleFactorY - midpointY;
+            const unBoundCurveX = Math.max(
+                Math.min(x / scaleFactorX - midpointX, curveXBoundingBox),
+                -curveXBoundingBox
+            );
+            const unBoundCurveY = Math.max(
+                Math.min(y / scaleFactorY - midpointY, curveYBoundingBox),
+                -curveYBoundingBox
+            );
 
             let { curveX, curveY } = getBoundedCurveValues(
                 sourceX,
@@ -193,8 +209,6 @@ function Edge({
         onChange({ ...edge, curveX: 0, curveY: 0 });
     };
 
-    const mockViewBox = `0 0 ${width} ${height}`;
-
     return (
         <>
             {showNodes && (
@@ -205,13 +219,13 @@ function Edge({
                     style={{
                         width: CONTROL_POINT_SIZE,
                         height: CONTROL_POINT_SIZE,
-                        left: controlX - CONTROL_POINT_SIZE / 2,
-                        top: controlY - CONTROL_POINT_SIZE / 2,
+                        left: controlXOnLine - CONTROL_POINT_SIZE / 2,
+                        top: controlYOnLine - CONTROL_POINT_SIZE / 2,
                         backgroundColor: theme.screenNode,
                     }}
                 ></div>
             )}
-            <svg className="absolute" viewBox={mockViewBox}>
+            <svg className="absolute" viewBox={viewBox}>
                 <path
                     d={path}
                     fill="none"

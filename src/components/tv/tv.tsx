@@ -1,5 +1,5 @@
+import { useEffect } from "react";
 import { Screens, useScreen } from "../../utils/screens-utils";
-import { KnobText } from "../knob/knob-text";
 import { MasterKnob } from "../knob/master-knob";
 import { ScreenButton } from "./screen-button";
 import {
@@ -31,7 +31,7 @@ export function TV({ children }: { children: React.ReactNode }) {
                     <Highlight />
                 </div>
                 <div className="relative">
-                    <div className="absolute bottom-[1px] z-[100]">
+                    <div className="absolute bottom-[1px] z-10">
                         <Border width={TV_WIDTH} height={TV_HEIGHT} />
                     </div>
                 </div>
@@ -49,6 +49,18 @@ function ScreenButtons() {
     const handleChangeScreen = (screen: Screens) => () => {
         setActiveScreen(screen);
     };
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const screen = params.get("screen");
+        if (screen && Object.values(Screens).includes(screen as Screens)) {
+            setActiveScreen(screen as Screens);
+        }
+    }, [setActiveScreen]);
+
+    useEffect(() => {
+        window.history.replaceState(null, "", `?screen=${activeScreen}`);
+    }, [activeScreen]);
 
     return (
         <div className="absolute bottom-4 flex w-full justify-between left-12 p-2 z-[100]">
