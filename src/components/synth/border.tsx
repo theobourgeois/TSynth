@@ -1,6 +1,7 @@
 import { cn } from "../../utils/style-utils";
 import { createStyles } from "../../utils/theme-utils";
 import { Indicator } from "../indicator/indicator";
+import { IndicatorButton } from "../indicator/indicator-button";
 
 const useStyles = createStyles((theme) => ({
     border: {
@@ -28,6 +29,7 @@ type OptionWrapperProps = {
     title: string;
     enabled?: boolean;
     className?: string;
+    onEnabledChange?: (enabled: boolean) => void;
 };
 
 export function OptionWrapper({
@@ -35,6 +37,7 @@ export function OptionWrapper({
     className,
     title,
     enabled,
+    onEnabledChange,
 }: OptionWrapperProps) {
     const styles = useStyles();
 
@@ -43,8 +46,11 @@ export function OptionWrapper({
             <div style={styles.body}>
                 <div className="flex gap-4 items-center pb-6">
                     <h2 style={styles.text}>{title}</h2>
-                    {enabled !== undefined && (
-                        <Indicator status={enabled ? "on" : "off"} />
+                    {enabled !== undefined && onEnabledChange && (
+                        <IndicatorButton
+                            status={enabled ? "on" : "off"}
+                            onChange={onEnabledChange}
+                        />
                     )}
                 </div>
                 {children}

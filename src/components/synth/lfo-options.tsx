@@ -25,7 +25,8 @@ export function LFOOptions() {
 
     return (
         <OptionWrapper title="LFO">
-            <div className="gap-8">
+            <div className="space-y-1">
+                <button className="-translate-y-4 w-5 h-5 rounded-full bg-black hover:cursor-copy active:cursor-grabbing"></button>
                 <KnobText
                     title="RATE"
                     value={LFO.rate}

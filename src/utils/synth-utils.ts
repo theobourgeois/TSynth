@@ -151,7 +151,7 @@ const initialLFO: LFO = {
 
   },
   rate: 0,
-  attachements: [LFOAttachement.LEVEL_OSC1],
+  attachements: [LFOAttachement.LEVEL_OSC1, LFOAttachement.LEVEL_OSC2],
 };
 
 const initialEnvelope: Envelope = {

@@ -10,7 +10,7 @@ function getIndicatorColor(status: "on" | "off", theme: Theme) {
     }
 }
 
-type IndicatorProps = {
+export type IndicatorProps = {
     status: "on" | "off";
 };
 

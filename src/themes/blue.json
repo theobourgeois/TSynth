@@ -13,13 +13,13 @@
   "screenShine": "#264066",
   "screenSecondary": "#94B6E9",
   "screenLine": "#32A10A",
-  "screenNode": "#1D8BBA",
+  "screenNode": "#32A10A",
   "screenGrid": "#7593C1",
   "knob": {
     "color": "#5E8FD9",
     "bg": "#D7D7D7",
     "indicator": "#C8C8C8",
-    "master": "#FF0000"
+    "master": "#FF3D3D"
   },
   "text": "#FFFFFF"
 }

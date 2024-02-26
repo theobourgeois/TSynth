@@ -31,6 +31,7 @@ export function OscillatorOptions({
             className="flex-grow"
             enabled={oscillator.enabled}
             title={`OSC ${oscillatorNumber}`}
+            onEnabledChange={handleChangeOscillator("enabled")}
         >
             <div className="gap-4 grid grid-cols-2">
                 <KnobText

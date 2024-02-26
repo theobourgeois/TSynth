@@ -4,7 +4,7 @@ import { snapTo } from "../../utils/utils-fns";
 import { Edge, Node } from "../../utils/graph-utils";
 
 const CONTROL_POINT_SIZE = 12;
-const EDGE_WIDTH = 3;
+const EDGE_WIDTH = 5;
 
 // bound the curve values between the source and target nodes
 function getBoundedCurveValues(

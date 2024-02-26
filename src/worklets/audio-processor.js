@@ -173,7 +173,7 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
         const dataLength = oscillator.wave.data.length;
 
         const unison = oscillator.unison;
-        const detune = oscillator.detune;
+        const detune = oscillator.detune / 100;
         const waveData = oscillator.wave.data;
         const level = oscillator.level;
         const pan = oscillator.pan;
