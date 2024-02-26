@@ -20,7 +20,7 @@ export const themes = {
 };
 
 export const useThemeStore = create<ThemeStore>((set) => ({
-    theme: themes.default,
+    theme: themes.blue,
     setTheme: (theme: ThemeTypes) => set({ theme: themes[theme] }),
 }));
 

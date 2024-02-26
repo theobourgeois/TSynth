@@ -3,8 +3,8 @@ import { useSynth } from "../../utils/synth-utils";
 import { createStyles } from "../../utils/theme-utils";
 import { EnvelopeScreen } from "../envelope/envelope-screen";
 import { FilterScreen } from "./filter-screen";
-import { LFOScreen } from "./lfo-screen";
 import { OscillatorScreen } from "../oscillator/oscillator-screen";
+import { LFOScreen } from "../lfo/lfo-screen";
 
 const useStyles = createStyles((theme) => ({
     screen: {

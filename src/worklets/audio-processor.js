@@ -24,7 +24,6 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
             this.refreshSynthState(
                 event.data.master,
                 event.data.envelope,
-                event.data.lfo,
                 event.data.oscillator1,
                 event.data.oscillator2,
                 event.data.filter
@@ -36,13 +35,12 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
      * Reinitialized the synth state.
      * Called whenver the synth state is updated in the main thread
      */
-    refreshSynthState(master, envelope, lfo, oscillator1, oscillator2, filter) {
+    refreshSynthState(master, envelope, oscillator1, oscillator2, filter) {
         this.master = master;
         this.envelope = envelope;
         this.oscillator1 = oscillator1;
         this.oscillator2 = oscillator2;
         this.filter = filter;
-        this.lfo = lfo;
     }
 
     /**
@@ -162,11 +160,21 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
         return totalEnvelopeWeight;
     }
 
-    getOscillatorWeight(oscillatorIndex, dataIndex) {
+    /**
+     *  Calculates the weight of the oscillator at the given frequency
+     */
+    getOscillatorWeight({ oscillatorIndex, frequency, frameIndex }) {
         const oscillator =
             oscillatorIndex === 1 ? this.oscillator1 : this.oscillator2;
+        if (!oscillator.enabled) {
+            return [0, 0];
+        }
+
+        const dataLength = oscillator.wave.data.length;
+
         const unison = oscillator.unison;
         const detune = oscillator.detune;
+        const waveData = oscillator.wave.data;
         const level = oscillator.level;
         const pan = oscillator.pan;
         const leftPan = pan <= 0 ? 1 : 1 - pan;
@@ -176,10 +184,21 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
         data[0] = 0;
         data[1] = 0;
 
+        // apply the unison and detune
         for (let u = 0; u < unison; u++) {
-            data[0] += oscillator.wave.data[dataIndex] * level * leftPan;
-            data[1] += oscillator.wave.data[dataIndex] * level * rightPan;
+            const newFrequency = frequency + u * detune;
+            const newPlaybackRate = (newFrequency * dataLength) / sampleRate;
+            const sampleIndex = Math.floor(
+                (frameIndex * newPlaybackRate) % dataLength
+            );
+
+            data[0] += waveData[sampleIndex] / oscillator.unison;
+            data[1] += waveData[sampleIndex] / oscillator.unison;
         }
+
+        // apply the level and pan
+        data[0] *= level * leftPan;
+        data[1] *= level * rightPan;
 
         return data;
     }
@@ -193,8 +212,6 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
     process(inputs, outputs) {
         const output = outputs[0];
 
-        const dataLength = this.oscillator1.wave.data.length;
-
         if (this.frequencies.length === 0) {
             return true;
         }
@@ -203,30 +220,26 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
             // iterate through each frequency and calculate the output
             for (let f = 0; f < this.frequencies.length; ++f) {
                 const frequency = this.frequencies[f].frequency;
+                const frameIndex = currentFrame + i;
+
                 const envelopeWeight = this.getEnvelopeWeight(f);
+                const oscillator1Weight = this.getOscillatorWeight({
+                    oscillatorIndex: 1,
+                    frequency,
+                    frameIndex,
+                });
+                const oscillator2Weight = this.getOscillatorWeight({
+                    oscillatorIndex: 2,
+                    frequency,
+                    frameIndex,
+                });
 
-                for (let u = 0; u < this.oscillator1.unison; u++) {
-                    const newFrequency =
-                        frequency + u * this.oscillator1.detune;
-                    const newPlaybackRate =
-                        (newFrequency * dataLength) / sampleRate;
-
-                    const sampleIndex = Math.floor(
-                        ((currentFrame + i) * newPlaybackRate) % dataLength
-                    );
-
-                    const data = this.oscillator1.wave.data[sampleIndex];
-
-                    output[0][i] +=
-                        (data / this.oscillator1.unison) * envelopeWeight;
-                    output[1][i] +=
-                        (data / this.oscillator1.unison) * envelopeWeight;
-                }
-
-                // const oscillator1Weight = this.getOscillatorWeight(
-                //     1,
-                //     dataIndex
-                // );
+                output[0][i] +=
+                    (oscillator1Weight[0] + oscillator2Weight[0]) *
+                    envelopeWeight;
+                output[1][i] +=
+                    (oscillator1Weight[1] + oscillator2Weight[1]) *
+                    envelopeWeight;
             }
         }
 

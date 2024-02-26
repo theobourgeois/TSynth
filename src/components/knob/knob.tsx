@@ -79,7 +79,7 @@ export function Knob({
             const clampedValue = snapTo(
                 Math.max(MIN, Math.min(MAX, newValue)),
                 STEP,
-                "floor"
+                "floor",
             );
 
             if (clampedValue !== value) {
@@ -128,7 +128,7 @@ export function Knob({
                 />
             </svg>
             <div
-                className="flex absolute justify-center items-center"
+                className="absolute flex items-center justify-center"
                 onMouseDown={handleMouseDown}
                 style={styles.background}
             >

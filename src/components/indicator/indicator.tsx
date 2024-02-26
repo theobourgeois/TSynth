@@ -24,8 +24,8 @@ export function Indicator({ status }: IndicatorProps) {
                 backgroundColor: color,
                 boxShadow:
                     status === "off"
-                        ? "inset 0 -1px 3px 0 rgba(0, 0, 0, 0.5), 0px 0px 2px 0 rgba(0, 0, 0, 0.5)"
-                        : `0 0 10px 0 ${color}`,
+                        ? "inset -1px 0px 10px 5px rgba(0, 0, 0, 0.95)"
+                        : `0 0 10px 0 ${color}, inset 0 -3px 9px 0 rgba(0, 0, 0, 0.3)`,
             }}
         ></div>
     );

@@ -9,7 +9,7 @@ export class AudioProcessor {
     this.audioContext = new AudioContext();
   }
 
-  async setProcessorData(data: SynthState) {
+  async setProcessorData(data: Omit<SynthState, 'LFO'>) {
     if (!this.audioProcessingNode) {
       await this.startAudioWorklets();
     }

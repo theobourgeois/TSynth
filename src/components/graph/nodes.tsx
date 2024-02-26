@@ -100,6 +100,7 @@ export function Nodes({
     const handleDeleteNode = (node: Node) => (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
+        if (node.anchorX || node.anchorY) return;
         onDelete(node.id);
     };
 
