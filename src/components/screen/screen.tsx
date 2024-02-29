@@ -2,7 +2,7 @@ import { Screens, useScreen } from "../../utils/screens-utils";
 import { useSynth } from "../../utils/synth-utils";
 import { createStyles } from "../../utils/theme-utils";
 import { EnvelopeScreen } from "../envelope/envelope-screen";
-import { FilterScreen } from "./filter-screen";
+import { FilterScreen } from "../filter/filter-screen";
 import { OscillatorScreen } from "../oscillator/oscillator-screen";
 import { LFOScreen } from "../lfo/lfo-screen";
 

@@ -1,6 +1,7 @@
 import { Screens, useScreen } from "../../utils/screens-utils";
 import {
     Envelope,
+    LFOAttachement,
     getDenormalizedAudioLevel,
     getDenormalizedMs,
     useSynth,
@@ -44,6 +45,7 @@ export function EnvelopeOptions() {
             <div className="flex gap-9">
                 <KnobText
                     title="ATT"
+                    attachment={LFOAttachement.ENV_ATTACK}
                     value={envelope.attack.x}
                     onChange={handleChangeEnvelope("attack")}
                     indicatorText={(value) =>
@@ -52,6 +54,7 @@ export function EnvelopeOptions() {
                 />
                 <KnobText
                     title="HOLD"
+                    attachment={LFOAttachement.ENV_HOLD}
                     value={envelope.hold.x}
                     onChange={handleChangeEnvelope("hold")}
                     indicatorText={(value) =>
@@ -60,6 +63,7 @@ export function EnvelopeOptions() {
                 />
                 <KnobText
                     title="DECAY"
+                    attachment={LFOAttachement.ENV_DECAY}
                     value={envelope.decay.x}
                     indicatorText={(value) =>
                         getDenormalizedMs(value).toFixed(0) + " MS"
@@ -67,7 +71,8 @@ export function EnvelopeOptions() {
                     onChange={handleChangeEnvelope("decay")}
                 />
                 <KnobText
-                    title="SUSTAIN"
+                    title="SUS"
+                    attachment={LFOAttachement.ENV_SUSTAIN}
                     value={envelope.decay.y}
                     onChange={handleChangeEnvelopeSustain}
                     indicatorText={(value) =>
@@ -76,6 +81,7 @@ export function EnvelopeOptions() {
                 />
                 <KnobText
                     title="REL"
+                    attachment={LFOAttachement.ENV_RELEASE}
                     value={envelope.release.x}
                     onChange={handleChangeEnvelope("release")}
                     indicatorText={(value) =>

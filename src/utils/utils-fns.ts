@@ -25,17 +25,27 @@ export function snapTo(value: number, step: number, option: "floor" | "ceil" | "
  * @param duration duration in ms
  */
 export function setContinuousInterval(callback: (currentMs: number) => void, duration: number) {
+    const fullDuration = duration * 2;
     return setInterval(() => {
         const startTime = new Date().getTime();
-        const expectedEndTime = startTime + duration;
+        const expectedEndTime = startTime + fullDuration;
         let elapsedMs = 0;
+        let isIncreasing = true;
         const innerInterval = setInterval(() => {
-            callback(elapsedMs)
             const currentTime = new Date().getTime();
-            elapsedMs++;
-            if (elapsedMs >= duration || currentTime >= expectedEndTime) {
+            if (currentTime > startTime + duration || elapsedMs >= duration) {
+                isIncreasing = false;
+            }
+            callback(elapsedMs)
+
+            if (isIncreasing) {
+                elapsedMs++;
+            } else {
+                elapsedMs--;
+            }
+            if (elapsedMs <= 0 || currentTime >= expectedEndTime) {
                 clearInterval(innerInterval);
             }
         }, 1);
-    }, duration);
+    }, fullDuration);
 }

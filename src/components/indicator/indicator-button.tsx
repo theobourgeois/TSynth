@@ -33,7 +33,7 @@ export function IndicatorButton({ onChange, ...props }: IndicatorButtonProps) {
     };
 
     return (
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center relative z-10">
             <div
                 className="hover:cursor-pointer"
                 onMouseDown={handleClick}

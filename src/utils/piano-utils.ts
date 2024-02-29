@@ -1,4 +1,4 @@
-enum Note {
+export enum Note {
   C = "c",
   CSharp = "c#",
   D = "d",
@@ -14,7 +14,7 @@ enum Note {
 }
 
 export const NOTES = {
-  [Note.C]: 16,
+  [Note.C]: 16.35,
   [Note.CSharp]: 17.32,
   [Note.D]: 18.35,
   [Note.DSharp]: 19.45,

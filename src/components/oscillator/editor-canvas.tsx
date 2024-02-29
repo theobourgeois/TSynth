@@ -15,7 +15,7 @@ export function Canvas({ dimensions, data }: EditorCanvasProps) {
 
     useEffect(() => {
         renderWaveform();
-    }, [data, dimensions]);
+    }, [data, dimensions, theme]);
 
     const renderWaveform = () => {
         const canvas = canvasRef.current;

@@ -7,6 +7,7 @@ export type Theme = typeof _default;
 export type ThemeTypes = keyof typeof themes;
 
 type ThemeStore = {
+    themeName: ThemeTypes;
     theme: Theme;
     setTheme: (theme: ThemeTypes) => void;
 };
@@ -22,8 +23,9 @@ export const themes = {
 };
 
 export const useThemeStore = create<ThemeStore>((set) => ({
-    theme: themes.pink,
-    setTheme: (theme: ThemeTypes) => set({ theme: themes[theme] }),
+    themeName: "default",
+    theme: themes.default,
+    setTheme: (themeName: ThemeTypes) => set({ theme: themes[themeName], themeName }),
 }));
 
 export function useTheme() {

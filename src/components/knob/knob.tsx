@@ -79,7 +79,7 @@ export function Knob({
             const clampedValue = snapTo(
                 Math.max(MIN, Math.min(MAX, newValue)),
                 STEP,
-                "floor",
+                "floor"
             );
 
             if (clampedValue !== value) {
@@ -159,12 +159,12 @@ function KnobPopup({ value, isShowing, indicatorText }: KnobPopupProps) {
 
     return (
         <div
-            className="absolute"
+            className="absolute z-20 left-1/2 -translate-x-1/2"
             style={{
-                left: 0,
                 top: -30,
                 width: "max-content",
-                backgroundColor: theme.knob.bg,
+                backgroundColor: `${theme.tvShadow}80`,
+                color: theme.text,
                 padding: "2px 4px",
                 borderRadius: 4,
                 fontSize: 12,

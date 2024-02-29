@@ -11,7 +11,6 @@ import { createStyles } from "../../utils/theme-utils";
 import { TV } from "../tv/tv";
 import { SynthOptions } from "./synth-options";
 import { Logo } from "./logo";
-import { Piano } from "../piano/piano";
 import { Screen } from "../screen/screen";
 import { setContinuousInterval } from "../../utils/utils-fns";
 
@@ -164,7 +163,6 @@ export function Synth() {
                     </TV>
                 </div>
                 <SynthOptions />
-                <Piano />
             </div>
         </div>
     );

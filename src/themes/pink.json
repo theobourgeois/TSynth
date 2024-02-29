@@ -7,8 +7,8 @@
   "tvHighlight": "#DF6BCD",
   "tvScreenOutline": "#292929",
   "tvButton": "#E65BD0",
-  "lightOn": "#FFB0F3",
-  "lightOff": "#AAAAAA",
+  "lightOn": "#FFFFFF",
+  "lightOff": "#FFFFFF",
   "screenPrimary": "#3B1A3E",
   "screenShine": "#722D78",
   "screenSecondary": "#E794E9",
@@ -21,5 +21,7 @@
     "indicator": "#C8C8C8",
     "master": "#D352BF"
   },
-  "text": "#FFFFFF"
+  "text": "#FFFFFF",
+  "textOn": "#FFB0F3",
+  "dragger": "#3B1A3E"
 }

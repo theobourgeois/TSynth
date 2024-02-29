@@ -1,4 +1,5 @@
 import {
+    LFOAttachement,
     Oscillator,
     getDenormalizedAudioLevel,
     getDenormalizedUnison,
@@ -36,6 +37,11 @@ export function OscillatorOptions({
             <div className="gap-4 grid grid-cols-2">
                 <KnobText
                     title="UNISON"
+                    attachment={
+                        oscillatorNumber === 1
+                            ? LFOAttachement.UNISON_OSC1
+                            : LFOAttachement.UNISON_OSC2
+                    }
                     value={oscillator.unison}
                     onChange={handleChangeOscillator("unison")}
                     indicatorText={(value) =>
@@ -44,11 +50,21 @@ export function OscillatorOptions({
                 />
                 <KnobText
                     title="DETUNE"
+                    attachment={
+                        oscillatorNumber === 1
+                            ? LFOAttachement.DETUNE_OSC1
+                            : LFOAttachement.DETUNE_OSC2
+                    }
                     value={oscillator.detune}
                     onChange={handleChangeOscillator("detune")}
                 />
                 <KnobText
                     title="LEVEL"
+                    attachment={
+                        oscillatorNumber === 1
+                            ? LFOAttachement.LEVEL_OSC1
+                            : LFOAttachement.LEVEL_OSC2
+                    }
                     value={oscillator.level}
                     onChange={handleChangeOscillator("level")}
                     indicatorText={(value) =>
@@ -57,6 +73,11 @@ export function OscillatorOptions({
                 />
                 <KnobText
                     title="PAN"
+                    attachment={
+                        oscillatorNumber === 1
+                            ? LFOAttachement.PAN_OSC1
+                            : LFOAttachement.PAN_OSC2
+                    }
                     value={oscillator.pan}
                     onChange={handleChangeOscillator("pan")}
                 />

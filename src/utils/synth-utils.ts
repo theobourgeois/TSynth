@@ -133,8 +133,8 @@ const initialFilter: Filter = {
   pan: 0,
   drive: 0,
   mix: 0,
-  osc1Enabled: false,
-  osc2Enabled: false,
+  osc1Enabled: true,
+  osc2Enabled: true,
 };
 
 const initialLFO: LFO = {
@@ -151,7 +151,7 @@ const initialLFO: LFO = {
 
   },
   rate: 0,
-  attachements: [LFOAttachement.LEVEL_OSC1, LFOAttachement.LEVEL_OSC2],
+  attachements: [],
 };
 
 const initialEnvelope: Envelope = {
@@ -199,7 +199,17 @@ export interface SynthStore extends SynthState {
   setEnvelope: (envelope: Envelope) => void;
 }
 
-const useSynthStore = create<SynthStore>((set) => ({
+type SynthUtilsStore = {
+  draggingLFOAttachment: LFOAttachement | null;
+  setDraggingLFOAttachment: (attachment: LFOAttachement | null) => void;
+};
+
+export const useSynthUtils = create<SynthUtilsStore>((set) => ({
+  draggingLFOAttachment: null,
+  setDraggingLFOAttachment: (attachment: LFOAttachement | null) => set({ draggingLFOAttachment: attachment }),
+}));
+
+export const useSynthStore = create<SynthStore>((set) => ({
   master: 0.1,
   oscillator1: initialOsillator1,
   oscillator2: initialOsillator2,

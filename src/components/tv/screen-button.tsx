@@ -14,8 +14,8 @@ const useStyles = createStyles((theme, isActiveScreen, isButtonActive) => ({
         cursor: "pointer",
     },
     text: {
-        color: isActiveScreen ? theme.lightOn : theme.text,
-        textShadow: isActiveScreen ? `0 0 10px ${theme.lightOn}` : "none",
+        color: isActiveScreen ? theme.textOn : theme.text,
+        textShadow: isActiveScreen ? `0 0 10px ${theme.textOn}` : "none",
         textAlign: "center",
         fontSize: "0.6em",
     },
