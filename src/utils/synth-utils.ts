@@ -230,6 +230,16 @@ export function useSynth() {
   return useSynthStore((state) => state);
 }
 
+const SAMPLE_BUFFER_LENGTH = 2048;
+
+export const useSampleBufferStore = create<{
+  sampleBuffer: Float32Array;
+  setSampleBuffer: (sampleBuffer: Float32Array) => void;
+}>((set) => ({
+  sampleBuffer: new Float32Array(SAMPLE_BUFFER_LENGTH),
+  setSampleBuffer: (sampleBuffer) => set({ sampleBuffer }),
+}));
+
 // f prefix means flipped
 export enum WaveEditorWaveType {
   Sine = "sine",
@@ -346,7 +356,7 @@ export function getDenormalizedMs(normalizedMs: number) {
   const minMs = 0.01;
   const maxMs = 3000;
 
-  return minMs + (maxMs - minMs) * normalizedMs;
+  return Math.floor(minMs + (maxMs - minMs) * normalizedMs)
 }
 
 /**

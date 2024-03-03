@@ -1,4 +1,4 @@
-import { useSynth, useSynthStore } from "../../utils/synth-utils";
+import { useSynthStore } from "../../utils/synth-utils";
 import { EnvelopeOptions } from "./envelope-options";
 import { FilterOptions } from "./filter-option";
 import { LFOOptions } from "./lfo-options";

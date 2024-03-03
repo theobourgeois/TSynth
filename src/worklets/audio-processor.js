@@ -4,12 +4,17 @@
  * It receives messages from the main thread and processes the audio data
  * See the Synth component in synth.ts and the AudioProcessor class in synth-utils.ts to see where the messages are sent and their format
  */
-class CustomOscillatorProcessor extends AudioWorkletProcessor {
+
+const SAMPLE_BUFFER_LENGTH = 2048;
+class AudioProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
         if (!this.startTime) {
             this.startTime = new Date().getTime();
         }
+        // sent to the front end for audio visualisation
+        this.sampleBuffer = new Float32Array(SAMPLE_BUFFER_LENGTH);
+        this.currentSampleIndex = 0;
         this.phase = 0;
         this.frequencies = [];
         this.port.onmessage = (event) => {
@@ -52,7 +57,7 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
         const newFrequency = {
             frequency: frequency,
             timeOfRelease: null,
-            currentTime: null,
+            currentTime: currentTime,
             levelToRelease: 0,
         };
 
@@ -133,14 +138,8 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
      * @returns  the weight of the envelope at the given frequency
      */
     getEnvelopeWeight(frequencyIndex) {
-        const { currentTime, timeOfRelease } = this.frequencies[frequencyIndex];
-        const timeSinceStart = new Date().getTime() - currentTime;
-        // set the current time on the first note
-        // this ensures that the time is as accurate as possible
-        // if we set the time in the constructor, it will be off by the time it takes to process the message
-        if (currentTime === null) {
-            this.frequencies[frequencyIndex].currentTime = new Date().getTime();
-        }
+        const { currentTime: currentFreqTime, timeOfRelease } =
+            this.frequencies[frequencyIndex];
 
         const isNoteReleased = timeOfRelease !== null;
         if (isNoteReleased) {
@@ -149,8 +148,11 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
         }
 
         const attackTime = this.envelope.attack.x;
+        let timeSinceStart = (currentTime - currentFreqTime) * 1000;
         const decaySustainWeight = this.getDecaySustainWeight(timeSinceStart);
-        const attackWeight = Math.min(timeSinceStart / attackTime, 1);
+        timeSinceStart = (currentTime - currentFreqTime) * 1000;
+        const attackWeight =
+            attackTime === 0 ? 1 : Math.min(timeSinceStart / attackTime, 1);
 
         const totalEnvelopeWeight = attackWeight * decaySustainWeight;
         // set the level to release for the next time
@@ -234,12 +236,15 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
                     frameIndex,
                 });
 
-                output[0][i] +=
+                const left =
                     (oscillator1Weight[0] + oscillator2Weight[0]) *
                     envelopeWeight;
-                output[1][i] +=
+                const right =
                     (oscillator1Weight[1] + oscillator2Weight[1]) *
                     envelopeWeight;
+
+                output[0][i] += left;
+                output[1][i] += right;
             }
         }
 
@@ -249,8 +254,20 @@ class CustomOscillatorProcessor extends AudioWorkletProcessor {
             output[1][i] *= this.master;
         }
 
+        for (let i = 0; i < output[0].length; i++) {
+            let index = this.currentSampleIndex + i;
+            if (index >= SAMPLE_BUFFER_LENGTH) {
+                this.port.postMessage({ sampleBuffer: this.sampleBuffer });
+                this.currentSampleIndex = 0;
+                this.sampleBuffer = new Float32Array(SAMPLE_BUFFER_LENGTH);
+                index = this.currentSampleIndex + i;
+            }
+            this.sampleBuffer[index] = (output[0][i] + output[1][i]) / 2;
+            this.currentSampleIndex++;
+        }
+
         return true;
     }
 }
 
-registerProcessor("audio-processor", CustomOscillatorProcessor);
+registerProcessor("audio-processor", AudioProcessor);

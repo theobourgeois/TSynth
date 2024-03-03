@@ -5,6 +5,7 @@ import { EnvelopeScreen } from "../envelope/envelope-screen";
 import { FilterScreen } from "../filter/filter-screen";
 import { OscillatorScreen } from "../oscillator/oscillator-screen";
 import { LFOScreen } from "../lfo/lfo-screen";
+import { OptionsScreen } from "../options/options-screen";
 
 const useStyles = createStyles((theme) => ({
     screen: {
@@ -45,6 +46,8 @@ export function Screen() {
                 return <EnvelopeScreen />;
             case Screens.LFO:
                 return <LFOScreen />;
+            case Screens.OPTIONS:
+                return <OptionsScreen />;
             default:
                 return null;
         }

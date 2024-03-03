@@ -1,5 +1,4 @@
 import { createStyles } from "../../utils/theme-utils";
-import { Piano } from "../piano/piano";
 import { SynthSettings } from "./synth-settings";
 
 const useStyles = createStyles((theme) => ({
@@ -18,9 +17,6 @@ export function SynthWrapper({ children }: { children: React.ReactNode }) {
             </div>
             <div className="flex items-center justify-center h-screen">
                 {children}
-            </div>
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
-                <Piano />
             </div>
         </div>
     );

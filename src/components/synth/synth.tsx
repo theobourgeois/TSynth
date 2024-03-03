@@ -13,6 +13,8 @@ import { SynthOptions } from "./synth-options";
 import { Logo } from "./logo";
 import { Screen } from "../screen/screen";
 import { setContinuousInterval } from "../../utils/utils-fns";
+import { Visualizer } from "../visualizer/visualizer";
+import { MIDIProvider } from "../../providers/midi/midi-provider";
 
 const useStyles = createStyles((theme) => ({
     synth: {
@@ -152,18 +154,21 @@ export function Synth() {
     };
 
     return (
-        <div style={styles.synth} className="rounded-md p-4 drop-shadow-md">
-            <div className="flex h-full gap-2">
-                <div className="">
-                    <div className="flex justify-between">
-                        <Logo />
+        <MIDIProvider>
+            <div style={styles.synth} className="rounded-md p-4 drop-shadow-lg">
+                <div className="flex h-full gap-2">
+                    <div className="">
+                        <div className="flex justify-between items-center">
+                            <Logo />
+                            <Visualizer />
+                        </div>
+                        <TV>
+                            <Screen />
+                        </TV>
                     </div>
-                    <TV>
-                        <Screen />
-                    </TV>
+                    <SynthOptions />
                 </div>
-                <SynthOptions />
             </div>
-        </div>
+        </MIDIProvider>
     );
 }

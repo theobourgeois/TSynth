@@ -1,5 +1,10 @@
 import { RefObject, useEffect, useRef, useState } from "react";
-import { NOTES, Note, keyToNoteMap } from "../../utils/piano-utils";
+import {
+    NOTES,
+    Note,
+    keyToNoteMap,
+    useKeysCurrentlyPressed,
+} from "../../utils/piano-utils";
 import { audioProcessor } from "../../utils/audio-processing";
 import { createStyles } from "../../utils/theme-utils";
 
@@ -37,7 +42,7 @@ const useStyles = createStyles((theme, isKeyPressed) => ({
             : "inset 0 4px 1px rgba(0,0,0, 1), inset 0 -6px 4px rgba(0,0,0,0.5)",
         border: `1px solid ${theme.tvScreenOutline}`,
         background: isKeyPressed
-            ? "linear-gradient(180deg, rgba(90,90,90,1) 0%, rgba(50,50,50,1) 100%)"
+            ? "linear-gradient(180deg, rgba(80,80,80,1) 0%, rgba(50,50,50,1) 100%)"
             : "linear-gradient(180deg, rgba(100,100,100,1) 0%, rgba(50,50,50,1) 100%)",
     },
 }));
@@ -65,9 +70,8 @@ function getFrequencyFromKeyIndex(keyIndex: number) {
 
 export function Piano() {
     const styles = useStyles();
-    const [keysCurrentlyPressed, setKeysCurrentlyPressed] = useState<{
-        [key in string]: boolean;
-    }>({});
+    const { keysCurrentlyPressed, addKey, removeKey } =
+        useKeysCurrentlyPressed();
     const keysCurrentlyPressedRef = useRef(keysCurrentlyPressed);
 
     useEffect(() => {
@@ -80,8 +84,7 @@ export function Piano() {
                 return;
             }
 
-            keysCurrentlyPressed[freq] = true;
-            setKeysCurrentlyPressed({ ...keysCurrentlyPressed });
+            addKey(freq);
             if (freq) {
                 audioProcessor.play(freq);
             }
@@ -89,10 +92,9 @@ export function Piano() {
 
         const handleKeyUp = (e: KeyboardEvent) => {
             const key = e.key.toLowerCase();
-            const keysCurrentlyPressed = keysCurrentlyPressedRef.current;
             const freq = keyToNoteMap[key];
-            keysCurrentlyPressed[freq] = false;
-            setKeysCurrentlyPressed({ ...keysCurrentlyPressed });
+
+            removeKey(freq);
             audioProcessor.stop(freq);
         };
 
@@ -118,7 +120,7 @@ export function Piano() {
     };
 
     return (
-        <div className="flex" style={styles.piano}>
+        <div className="flex w-full justify-center" style={styles.piano}>
             {Array.from({ length: NUM_OF_KEYS }).map((_, keyIndex) => {
                 if (isBlackKey(keyIndex)) {
                     return (
@@ -200,7 +202,7 @@ function WhiteKey({
         <div
             ref={keyRef}
             style={styles.whiteKey}
-            className="bg-white h-[100px] w-8 cursor-pointer"
+            className="bg-white h-[100px] w-9 cursor-pointer"
         ></div>
     );
 }

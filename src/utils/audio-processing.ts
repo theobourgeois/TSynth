@@ -4,6 +4,7 @@ export class AudioProcessor {
 
   audioContext: AudioContext;
   audioProcessingNode: AudioWorkletNode | undefined;
+  sampleBufferListener: ((buffer: Float32Array) => void) | undefined;
 
   constructor() {
     this.audioContext = new AudioContext();
@@ -14,6 +15,13 @@ export class AudioProcessor {
       await this.startAudioWorklets();
     }
     this.audioProcessingNode?.port.postMessage(data);
+    if (!this?.audioProcessingNode?.port) return;
+    this.audioProcessingNode.port.onmessage = (event) => {
+      const sampleBuffer = event.data.sampleBuffer;
+      if (sampleBuffer) {
+        this.sampleBufferListener?.(sampleBuffer);
+      }
+    }
   }
 
   startAudioProcessor() {
@@ -40,6 +48,12 @@ export class AudioProcessor {
     if (freq) {
       this.audioProcessingNode?.port.postMessage({ removeFrequency: freq });
     }
+  }
+
+  setSampleBufferListener(callback: (buffer: Float32Array) => void) {
+    this.sampleBufferListener = callback;
+
+
   }
 
   async startAudioWorklets() {

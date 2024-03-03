@@ -2,6 +2,7 @@ import { create } from "zustand";
 import _default from "../themes/default.json";
 import _blue from "../themes/blue.json";
 import _pink from "../themes/pink.json";
+import _dark from "../themes/dark.json";
 
 export type Theme = typeof _default;
 export type ThemeTypes = keyof typeof themes;
@@ -19,7 +20,8 @@ type CreateStylesArugmentFn = (theme: Theme, ...args: unknown[]) => {
 export const themes = {
     default: _default,
     blue: _blue,
-    pink: _pink
+    pink: _pink,
+    dark: _dark,
 };
 
 export const useThemeStore = create<ThemeStore>((set) => ({

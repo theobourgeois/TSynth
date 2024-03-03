@@ -6,6 +6,7 @@ export enum Screens {
   LFO = "LFO",
   ENVELOPE = "ENV",
   FILTER = "FILTER",
+  OPTIONS = "OPTIONS",
 }
 
 type ScreenStore = {

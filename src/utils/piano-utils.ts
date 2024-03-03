@@ -1,3 +1,5 @@
+import { create } from "zustand";
+
 export enum Note {
   C = "c",
   CSharp = "c#",
@@ -74,4 +76,31 @@ export function getNoteFrequency(note: Note, octave: number) {
   return noteFrequency * Math.pow(2, octave);
 }
 
+type KeysPressed = {
+  [key in number]: boolean;
+}
+
+type SelectedKeysState = {
+  keysCurrentlyPressed: KeysPressed;
+  addKey: (key: number) => void;
+  removeKey: (key: number) => void;
+}
+
+const useSelectedKeysStore = create<SelectedKeysState>((set) => ({
+  keysCurrentlyPressed: {},
+  addKey: (key: number) => set((state) => {
+    const newState = { ...state };
+    newState.keysCurrentlyPressed[key] = true;
+    return newState
+  }),
+  removeKey: (key: number) => set((state) => {
+    const newState = { ...state };
+    newState.keysCurrentlyPressed[key] = false;
+    return newState
+  })
+}));
+
+export function useKeysCurrentlyPressed() {
+  return useSelectedKeysStore((state) => state);
+}
 
