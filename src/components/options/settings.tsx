@@ -1,6 +1,6 @@
 import { useThemeStore, ThemeTypes, themes } from "../../utils/theme-utils";
 import { Label, Select } from "../screen/inputs";
-import { useMIDI } from "../../providers/midi/midi-provider";
+import { useMIDI } from "../../providers/midi-provider";
 
 export function Settings() {
     const themeName = useThemeStore((state) => state.themeName);
@@ -12,9 +12,11 @@ export function Settings() {
         setTheme(themeName as ThemeTypes);
     };
 
-    const handleChangeMIDIDevice = (deviceID: string) => {
-        const device = MIDIDevices.find((device) => device.id === deviceID);
-        setSelectedMIDIDevice(device);
+    const handleChangeMIDIDevice = (deviceId: string) => {
+        const device = MIDIDevices.find((device) => device.id === deviceId);
+        if (device) {
+            setSelectedMIDIDevice(device);
+        }
     };
 
     return (

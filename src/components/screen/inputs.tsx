@@ -2,8 +2,9 @@ import { useState } from "react";
 import { createStyles } from "../../utils/theme-utils";
 import { cn } from "../../utils/style-utils";
 import ClickAwayListener from "react-click-away-listener";
+import { UpDownButton, UpDownInput } from "./up-down-button";
 
-const useStyles = createStyles((theme, isSelectedValue) => ({
+const useStyles = createStyles((theme, isSelectedValue, isHovering) => ({
     select: {
         backgroundColor: theme.screenPrimary,
         color: theme.screenSecondary,
@@ -24,10 +25,14 @@ const useStyles = createStyles((theme, isSelectedValue) => ({
     },
     option: {
         padding: "0.1rem 0.5rem",
-        backgroundColor: isSelectedValue
-            ? theme.screenSecondary
-            : theme.screenPrimary,
-        color: isSelectedValue ? theme.screenPrimary : theme.screenSecondary,
+        backgroundColor:
+            isSelectedValue || isHovering
+                ? theme.screenSecondary
+                : theme.screenPrimary,
+        color:
+            isSelectedValue || isHovering
+                ? theme.screenPrimary
+                : theme.screenSecondary,
         cursor: "pointer",
     },
     label: {
@@ -57,6 +62,22 @@ export function Select({ value, options, onChange }: SelectProps) {
         setIsOpen(!isOpen);
     };
 
+    const handleNext = () => {
+        const currentIndex = options.findIndex(
+            (option) => option.value === value
+        );
+        const nextIndex = (currentIndex + 1) % options.length;
+        onChange(options[nextIndex].value);
+    };
+
+    const handlePrev = () => {
+        const currentIndex = options.findIndex(
+            (option) => option.value === value
+        );
+        const prevIndex = (currentIndex - 1 + options.length) % options.length;
+        onChange(options[prevIndex].value);
+    };
+
     const label = options.find((option) => option.value === value)?.label;
 
     return (
@@ -67,6 +88,11 @@ export function Select({ value, options, onChange }: SelectProps) {
                 onClick={handleOpen}
             >
                 {label}
+                <UpDownButton
+                    onDown={handlePrev}
+                    onUp={handleNext}
+                    horizontal
+                />
                 <div
                     style={styles.optionList}
                     className={cn(
@@ -97,12 +123,29 @@ type OptionProps = {
 };
 
 function Option({ label, value, onChange, isSelectedValue }: OptionProps) {
-    const styles = useStyles(isSelectedValue);
+    // i hate that i have to do this
+    const [isHovering, setIsHovering] = useState(false);
+    const styles = useStyles(isSelectedValue, isHovering);
+
     const handleChange = () => {
         onChange(value);
     };
+
+    const handleMouseEnter = () => {
+        setIsHovering(true);
+    };
+
+    const handleMouseLeave = () => {
+        setIsHovering(false);
+    };
+
     return (
-        <div style={styles.option} onClick={handleChange}>
+        <div
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            style={styles.option}
+            onClick={handleChange}
+        >
             {label}
         </div>
     );

@@ -7,7 +7,7 @@ import {
 import { WaveEditor } from "./wave-editor";
 import { ScreenTitle } from "../screen/screen-title";
 import { createStyles } from "../../utils/theme-utils";
-import { UpDownButton } from "../screen/up-down-button";
+import { UpDownInput } from "../screen/up-down-button";
 import { OscillatorTypes } from "./oscillator-shapes";
 
 const useStyles = createStyles((theme) => ({
@@ -74,7 +74,7 @@ export function OscillatorScreen({
                         <div className="flex gap-2">
                             <div className="flex gap-2">
                                 <p style={styles.text}>{gridSizes.x}</p>
-                                <UpDownButton
+                                <UpDownInput
                                     horizontal
                                     value={gridSizes.x}
                                     onChange={(value) =>
@@ -84,7 +84,7 @@ export function OscillatorScreen({
                             </div>
                             <div className="flex gap-1">
                                 <p style={styles.text}>{gridSizes.y}</p>
-                                <UpDownButton
+                                <UpDownInput
                                     value={gridSizes.y}
                                     onChange={(value) =>
                                         setGridSizes({ ...gridSizes, y: value })

@@ -1,4 +1,5 @@
 import { ScreenTitle } from "../screen/screen-title";
+import { Recorder } from "../recorder/recorder";
 import { Settings } from "./settings";
 
 export function OptionsScreen() {
@@ -7,6 +8,7 @@ export function OptionsScreen() {
             <ScreenTitle title="OPTIONS" />
             <div className="flex flex-col gap-2">
                 <Settings />
+                <Recorder />
             </div>
         </div>
     );

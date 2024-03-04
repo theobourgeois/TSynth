@@ -34,8 +34,10 @@ export function Canvas({ dimensions, data }: EditorCanvasProps) {
         }
         context.strokeStyle = theme.screenLine;
         context.lineWidth = 8;
+        context.fillStyle = theme.screenLine + "20";
         context.shadowColor = theme.screenLine;
         context.shadowBlur = 10;
+        context.fill();
         context.stroke();
     };
 

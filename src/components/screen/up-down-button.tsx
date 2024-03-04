@@ -25,7 +25,7 @@ const useStyles = createStyles((theme) => ({
     },
 }));
 
-type UpDownButtonProps = {
+type UpDownInputProps = {
     value: number;
     onChange: (value: number) => void;
     min?: number;
@@ -33,13 +33,13 @@ type UpDownButtonProps = {
     horizontal?: boolean;
 };
 
-export function UpDownButton({
+export function UpDownInput({
     value,
     min = 0,
     max = 64,
     onChange,
     horizontal = false,
-}: UpDownButtonProps) {
+}: UpDownInputProps) {
     const styles = useStyles();
     const [isHoldingDown, setIsHoldingDown] = useState({
         up: false,
@@ -95,6 +95,46 @@ export function UpDownButton({
     };
 
     return (
+        <UpDownButton
+            horizontal={horizontal}
+            onUp={handleUp}
+            onDown={handleDown}
+            upDisabled={value >= max}
+            downDisabled={value <= min}
+        />
+    );
+}
+
+type UpDownButtonProps = {
+    onUp: () => void;
+    onDown: () => void;
+    upDisabled?: boolean;
+    downDisabled?: boolean;
+    horizontal?: boolean;
+};
+
+export function UpDownButton({
+    horizontal,
+    onDown,
+    onUp,
+    upDisabled,
+    downDisabled,
+}: UpDownButtonProps) {
+    const styles = useStyles();
+
+    const handleUp = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onUp();
+    };
+
+    const handleDown = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onDown();
+    };
+
+    return (
         <div
             className={cn(
                 "flex flex-col gap-1",
@@ -102,12 +142,12 @@ export function UpDownButton({
             )}
         >
             <button
-                disabled={value >= max}
+                disabled={upDisabled}
                 onMouseDown={handleUp}
                 style={styles.arrowUp}
             ></button>
             <button
-                disabled={value <= min}
+                disabled={downDisabled}
                 onMouseDown={handleDown}
                 style={styles.arrowDown}
             ></button>

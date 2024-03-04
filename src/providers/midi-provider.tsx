@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createContext, useContext, useEffect, useState } from "react";
-import { audioProcessor } from "../../utils/audio-processing";
-import { MIDIMessageCommand } from "../../utils/midi-utils";
+import { audioProcessor } from "../utils/audio-processing";
+import { MIDIMessageCommand } from "../utils/midi-utils";
 import {
     NOTES,
     Note,
     getNoteFrequency,
     useKeysCurrentlyPressed,
-} from "../../utils/piano-utils";
+} from "../utils/piano-utils";
 
 type MIDIContextType = {
     MIDIDevices: MIDIInput[];
@@ -47,7 +47,21 @@ export function MIDIProvider({ children }: { children: React.ReactNode }) {
                 inputArray.push(input.value);
             }
 
-            setSelectedMIDIDevice(inputArray[1]);
+            const localStorageSelectedMIDIDevice =
+                localStorage.getItem("selectedMIDIDevice");
+            if (localStorageSelectedMIDIDevice) {
+                const selectedDevice = inputArray.find(
+                    (device) => device.id === localStorageSelectedMIDIDevice
+                );
+                if (selectedDevice) {
+                    setSelectedMIDIDevice(selectedDevice);
+                } else {
+                    setSelectedMIDIDevice(inputArray[0]);
+                }
+            } else {
+                setSelectedMIDIDevice(inputArray[0]);
+            }
+
             setMIDIDevices(inputArray);
         };
 
@@ -59,6 +73,10 @@ export function MIDIProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     useEffect(() => {
+        localStorage.setItem(
+            "selectedMIDIDevice",
+            selectedMIDIDevice?.id || ""
+        );
         const onMIDIMessage = (event: MIDIMessageEvent) => {
             const [command, note] = event.data;
             const octave = Math.floor(note / 12) - 1;

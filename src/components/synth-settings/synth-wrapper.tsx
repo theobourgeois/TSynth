@@ -1,5 +1,4 @@
 import { createStyles } from "../../utils/theme-utils";
-import { SynthSettings } from "./synth-settings";
 
 const useStyles = createStyles((theme) => ({
     bg: {
@@ -12,9 +11,6 @@ export function SynthWrapper({ children }: { children: React.ReactNode }) {
     const styles = useStyles();
     return (
         <div style={styles.bg}>
-            <div className="absolute left-0 top-0">
-                <SynthSettings />
-            </div>
             <div className="flex items-center justify-center h-screen">
                 {children}
             </div>
