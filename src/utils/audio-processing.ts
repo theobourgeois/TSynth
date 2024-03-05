@@ -80,6 +80,7 @@ export class AudioProcessor {
     if (!this.audioContext) {
       return
     }
+    console.log('startworklet', this.audioContext)
 
     await this.audioContext.audioWorklet.addModule(
       "src/worklets/audio-processor.js"
@@ -97,6 +98,7 @@ export class AudioProcessor {
         outputChannelCount: [2],
       }
     );
+    console.log('startworklet', this.audioProcessingNode)
     this.startAudioProcessor();
   }
 }
