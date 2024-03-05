@@ -11,6 +11,9 @@ export class AudioProcessor {
   }
 
   async setProcessorData(data: Omit<SynthState, "LFO">) {
+    if (!this.audioContext) {
+      return;
+    }
     if (!this.audioProcessingNode) {
       await this.startAudioWorklets();
     }
@@ -44,6 +47,9 @@ export class AudioProcessor {
   }
 
   play(frequency: number) {
+    if (!this.audioContext) {
+      this.audioContext = new AudioContext();
+    }
     if (this.audioContext.state === "suspended") {
       this.audioContext.resume();
     }
