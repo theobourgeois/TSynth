@@ -4,6 +4,9 @@
 
 TSynth is a synthesizer application developed for the web. It aims to provide users with comprehensive tools for sound design and synthesis through a web interface. 
 
+
+![alt text](images/Tsynthsplit.png)
+
 ## Features
 
 ### Oscillators
