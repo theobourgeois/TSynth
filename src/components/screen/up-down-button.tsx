@@ -40,7 +40,6 @@ export function UpDownInput({
     onChange,
     horizontal = false,
 }: UpDownInputProps) {
-    const styles = useStyles();
     const [isHoldingDown, setIsHoldingDown] = useState({
         up: false,
         down: false,

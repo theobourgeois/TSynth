@@ -1,5 +1,4 @@
 import { useRef, useEffect } from "react";
-import { cn } from "../../utils/style-utils";
 import { WaveEditorWaveType } from "../../utils/synth-utils";
 import { useTheme } from "../../utils/theme-utils";
 

@@ -87,7 +87,7 @@ export class AudioProcessor {
 
 export const audioProcessor = new AudioProcessor();
 
-async function toBlobURL(url, mimeType) {
+async function toBlobURL(url: string, mimeType: string) {
   // Fetch the resource from the URL
   const response = await fetch(url);
   if (!response.ok) {

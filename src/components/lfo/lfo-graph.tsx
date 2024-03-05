@@ -56,7 +56,8 @@ function getLFOFromGraphData(data: GraphData, gridSize: GridSize): LFOData {
 
 export function LFOGraph() {
     const { LFO, setLFO } = useSynth();
-    const [gridSize, setGridSize] = useState({ x: 8, y: 8 });
+    // TODO - set grid size
+    const [gridSize] = useState({ x: 8, y: 8 });
 
     const handleChangeGraphData = (data: GraphData) => {
         const LFOData = getLFOFromGraphData(data, gridSize);

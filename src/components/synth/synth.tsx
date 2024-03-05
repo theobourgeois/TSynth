@@ -14,7 +14,6 @@ import { Logo } from "./logo";
 import { Screen } from "../screen/screen";
 import { setContinuousInterval } from "../../utils/utils-fns";
 import { Visualizer } from "../visualizer/visualizer";
-import { MIDIProvider } from "../../providers/midi-provider";
 import { AllProviders } from "../../providers/all-providers";
 
 const useStyles = createStyles((theme) => ({
