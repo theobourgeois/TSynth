@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * File responsible for processing the audio data
  * This file is run in a separate thread

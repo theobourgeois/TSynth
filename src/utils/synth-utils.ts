@@ -94,7 +94,7 @@ export type Envelope = {
 const initialOsillator1: Oscillator = {
   enabled: true,
   wave: {
-    data: Array.from({ length: 1024 }, (_, i) => Math.sin(i / 164)),
+    data: Array.from({ length: 1024 }, (_, i) => Math.sin(i / 162.5)),
     octave: 0,
     semitone: 0,
     fine: 0,
@@ -111,7 +111,7 @@ const initialOsillator1: Oscillator = {
 const initialOsillator2: Oscillator = {
   enabled: false,
   wave: {
-    data: Array.from({ length: 1024 }, (_, i) => Math.sin(i / 164)),
+    data: Array.from({ length: 1024 }, (_, i) => Math.sin(i / 162.5)),
     octave: 0,
     semitone: 0,
     fine: 0,
