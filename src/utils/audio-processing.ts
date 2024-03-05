@@ -7,6 +7,9 @@ export class AudioProcessor {
   sampleBufferListener: ((buffer: Float32Array) => void) | undefined;
 
   async setProcessorData(data: Omit<SynthState, "LFO">) {
+    console.log({
+      data, audioContext: this.audioContext
+    })
     if (!this.audioContext) {
       return;
     }
@@ -62,7 +65,6 @@ export class AudioProcessor {
   }
 
   stop(freq?: number) {
-    //this.audioProcessingNode?.parameters?.get("playing")?.setValueAtTime(0, this.audioContext.currentTime);
     if (freq) {
       this.audioProcessingNode?.port.postMessage({
         removeFrequency: freq,
@@ -78,12 +80,15 @@ export class AudioProcessor {
     if (!this.audioContext) {
       return
     }
+
     await this.audioContext.audioWorklet.addModule(
       "src/worklets/audio-processor.js"
     );
+
     if (this.audioProcessingNode) {
       this.stopAudioProcessor();
     }
+
     this.audioProcessingNode = new AudioWorkletNode(
       this.audioContext,
       "audio-processor",
