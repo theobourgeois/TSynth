@@ -40,7 +40,7 @@ export function Synth() {
             envelope,
             filter,
         });
-        audioProcessor.setProcessorData(payload);
+        audioProcessor.setProcessorData(payload).catch(console.error);
         synthRef.current = synth;
     }, [synth]);
 
