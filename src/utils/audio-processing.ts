@@ -2,13 +2,9 @@ import { SynthState } from "./synth-utils";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 
 export class AudioProcessor {
-  audioContext: AudioContext;
+  audioContext: AudioContext | null = null;
   audioProcessingNode: AudioWorkletNode | undefined;
   sampleBufferListener: ((buffer: Float32Array) => void) | undefined;
-
-  constructor() {
-    this.audioContext = new AudioContext();
-  }
 
   async setProcessorData(data: Omit<SynthState, "LFO">) {
     if (!this.audioContext) {
@@ -28,6 +24,9 @@ export class AudioProcessor {
   }
 
   createMediaRecorder() {
+    if (!this.audioContext) {
+      this.audioContext = new AudioContext();
+    }
     const dest = this.audioContext.createMediaStreamDestination();
     this.audioProcessingNode?.connect(dest);
     const mediaRecorder = new MediaRecorder(dest.stream);
@@ -36,6 +35,9 @@ export class AudioProcessor {
   }
 
   startAudioProcessor() {
+    if (!this.audioContext) {
+      return;
+    }
     this.audioProcessingNode?.connect(this.audioContext.destination);
   }
 
@@ -73,6 +75,9 @@ export class AudioProcessor {
   }
 
   async startAudioWorklets() {
+    if (!this.audioContext) {
+      return
+    }
     await this.audioContext.audioWorklet.addModule(
       "src/worklets/audio-processor.js"
     );

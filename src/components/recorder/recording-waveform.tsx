@@ -49,7 +49,7 @@ export function RecordingWaveform() {
         const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
         const arrayBuffer = await audioBlob.arrayBuffer();
 
-        audioProcessor.audioContext.decodeAudioData(arrayBuffer, (buffer) => {
+        audioProcessor?.audioContext?.decodeAudioData(arrayBuffer, (buffer) => {
             const leftChannelData = buffer.getChannelData(0);
             const rightChannelData = buffer.getChannelData(1);
             const step = Math.ceil(leftChannelData.length / width);
