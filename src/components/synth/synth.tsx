@@ -40,7 +40,9 @@ export function Synth() {
             envelope,
             filter,
         });
-        audioProcessor.setProcessorData(payload).catch(console.error);
+        audioProcessor.setProcessorData(payload).catch((error) => {
+            console.error("Error setting processor data", error);
+        });
         synthRef.current = synth;
     }, [synth]);
 
