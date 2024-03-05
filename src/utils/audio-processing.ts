@@ -8,7 +8,7 @@ export class AudioProcessor {
 
   async setProcessorData(data: Omit<SynthState, "LFO">) {
     console.log({
-      data, audioContext: this.audioContext
+      data, audioContext: this.audioContext, audioProcessingNode: this.audioProcessingNode
     })
     if (!this.audioContext) {
       return;
