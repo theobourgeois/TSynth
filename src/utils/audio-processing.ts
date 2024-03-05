@@ -83,9 +83,8 @@ export class AudioProcessor {
     console.log('startworklet', this.audioContext)
 
     try {
-
       await this.audioContext.audioWorklet.addModule(
-        "src/worklets/audio-processor.js"
+        "worklets/audio-processor.js"
       );
     } catch (error) {
       console.error('Error starting worklet:', error)
