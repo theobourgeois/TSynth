@@ -1,8 +1,8 @@
-# TSynth Documentation
+# TSynth
 
 ## Overview
 
-TSynth is a synthesizer application developed for web platforms. It aims to provide users with comprehensive tools for sound design and synthesis through a web interface. 
+TSynth is a synthesizer application developed for the web. It aims to provide users with comprehensive tools for sound design and synthesis through a web interface. 
 
 ## Features
 
