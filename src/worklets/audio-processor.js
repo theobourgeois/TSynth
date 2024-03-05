@@ -186,16 +186,25 @@ class AudioProcessor extends AudioWorkletProcessor {
         data[0] = 0;
         data[1] = 0;
 
+        const maxDetuneCents = 50;
+
         // apply the unison and detune
         for (let u = 0; u < unison; u++) {
-            const newFrequency = frequency + u * detune;
+            // Calculate the detune factor for this oscillator
+            const detuneStep =
+                (u - Math.floor(unison / 2)) / Math.max(1, (unison - 1) / 2);
+            const detuneRatio = Math.pow(
+                2,
+                (maxDetuneCents * detune * detuneStep) / 1200
+            );
+            const newFrequency = frequency * detuneRatio;
             const newPlaybackRate = (newFrequency * dataLength) / sampleRate;
             const sampleIndex = Math.floor(
                 (frameIndex * newPlaybackRate) % dataLength
             );
 
-            data[0] += waveData[sampleIndex] / oscillator.unison;
-            data[1] += waveData[sampleIndex] / oscillator.unison;
+            data[0] += waveData[sampleIndex] / unison;
+            data[1] += waveData[sampleIndex] / unison;
         }
 
         // apply the level and pan

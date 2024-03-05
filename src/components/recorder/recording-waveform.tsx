@@ -20,17 +20,32 @@ export function RecordingWaveform() {
     const { audioChunks } = useRecorder();
 
     useEffect(() => {
-        if (audioChunks.length > 0) {
-            renderWaveform(audioChunks);
-        }
+        renderWaveform(audioChunks);
     }, [audioChunks, width, height, theme]);
 
     const renderWaveform = async (audioChunks: Blob[]) => {
         const canvas = canvasRef.current;
         const context = canvas?.getContext("2d");
         if (!context) return;
-
         context.clearRect(0, 0, width, height);
+
+        function handleDrawStroke() {
+            if (!context) return;
+            context.strokeStyle = theme.screenLine;
+            context.lineWidth = 2;
+            context.shadowColor = theme.screenLine;
+            context.shadowBlur = 10;
+            context.stroke();
+        }
+
+        if (audioChunks.length === 0) {
+            context.beginPath();
+            context.moveTo(0, height / 2);
+            context.lineTo(width, height / 2);
+            handleDrawStroke();
+            return;
+        }
+
         const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
         const arrayBuffer = await audioBlob.arrayBuffer();
 
@@ -44,8 +59,8 @@ export function RecordingWaveform() {
             context.moveTo(0, amp);
 
             for (let x = 0; x < width; x++) {
-                const min = x * step; // Define the minimum sample for the current step
-                let max = min + step; // Define the maximum sample for the current step
+                const min = x * step;
+                let max = min + step;
                 max =
                     max < leftChannelData.length ? max : leftChannelData.length;
                 let sum = 0;
@@ -60,11 +75,7 @@ export function RecordingWaveform() {
             }
         });
 
-        context.strokeStyle = theme.screenLine;
-        context.lineWidth = 2;
-        context.shadowColor = theme.screenLine;
-        context.shadowBlur = 10;
-        context.stroke();
+        handleDrawStroke();
     };
 
     return (

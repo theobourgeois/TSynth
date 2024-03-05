@@ -4,6 +4,7 @@ import { audioProcessor, convertWebmToMp3 } from "../utils/audio-processing";
 type RecorderContextType = {
     startRecording: () => void;
     stopRecording: () => void;
+    clearRecording: () => void;
     isDoneRecording: boolean;
     downloadRecording: (fileName: string) => void;
     isRecording: boolean;
@@ -58,13 +59,24 @@ export function RecorderProvider({ children }: { children: React.ReactNode }) {
         const audioBlob = new Blob(audioChunks, {
             type: "audio/webm;codecs=opus",
         });
-        const mp3Blob = await convertWebmToMp3(audioBlob, fileName);
-        const url = URL.createObjectURL(mp3Blob);
+        try {
+            const mp3Blob = await convertWebmToMp3(audioBlob, fileName);
+            const url = URL.createObjectURL(mp3Blob);
 
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${fileName}.mp3`;
-        a.click();
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${fileName}.mp3`;
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const clearRecording = () => {
+        setAudioChunks([]);
+        setIsDoneRecording(false);
     };
 
     return (
@@ -76,6 +88,7 @@ export function RecorderProvider({ children }: { children: React.ReactNode }) {
                 startRecording,
                 stopRecording,
                 downloadRecording,
+                clearRecording,
             }}
         >
             {children}

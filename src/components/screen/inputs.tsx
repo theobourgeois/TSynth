@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { createStyles } from "../../utils/theme-utils";
+import { createStyles, useTheme } from "../../utils/theme-utils";
 import { cn } from "../../utils/style-utils";
 import ClickAwayListener from "react-click-away-listener";
-import { UpDownButton, UpDownInput } from "./up-down-button";
+import { UpDownButton } from "./up-down-button";
 
 const useStyles = createStyles((theme, isSelectedValue, isHovering) => ({
     select: {
@@ -38,6 +38,12 @@ const useStyles = createStyles((theme, isSelectedValue, isHovering) => ({
     label: {
         color: theme.screenSecondary,
         fontSize: "1rem",
+    },
+    textField: {
+        backgroundColor: theme.screenPrimary,
+        color: theme.screenSecondary,
+        padding: "0.2rem 0.5rem",
+        borderRadius: "0.2rem",
     },
 }));
 
@@ -154,4 +160,62 @@ function Option({ label, value, onChange, isSelectedValue }: OptionProps) {
 export function Label({ children }: { children: React.ReactNode }) {
     const styles = useStyles();
     return <p style={styles.label}>{children}</p>;
+}
+
+type ButtonProps = {
+    onClick: () => void;
+    children: React.ReactNode;
+    disabled?: boolean;
+    variant?: "primary" | "secondary";
+};
+
+export function Button({
+    onClick,
+    children,
+    disabled,
+    variant = "primary",
+}: ButtonProps) {
+    const theme = useTheme();
+    const style = () => {
+        switch (variant) {
+            case "primary":
+                return {
+                    backgroundColor: theme.screenPrimary,
+                    color: theme.screenSecondary,
+                };
+            case "secondary":
+                return {
+                    backgroundColor: theme.screenSecondary,
+                    color: theme.screenPrimary,
+                };
+        }
+    };
+
+    return (
+        <button
+            disabled={disabled}
+            className="px-2 py-1 flex items-center justify-center"
+            style={{ ...style(), borderRadius: "0.2rem" }}
+            onClick={onClick}
+        >
+            {children}
+        </button>
+    );
+}
+
+type TextFieldProps = React.InputHTMLAttributes<HTMLInputElement>;
+export function TextField({ ...props }: TextFieldProps) {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        props.onChange?.(e);
+    };
+    const styles = useStyles();
+    return (
+        <input
+            {...props}
+            onChange={handleChange}
+            style={styles.textField}
+        ></input>
+    );
 }

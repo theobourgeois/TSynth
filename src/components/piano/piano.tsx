@@ -75,7 +75,19 @@ export function Piano() {
     const keysCurrentlyPressedRef = useRef(keysCurrentlyPressed);
 
     useEffect(() => {
+        const isInputElement = (e: Event) => {
+            const target = e.target as HTMLElement;
+            return (
+                target.tagName === "INPUT" ||
+                target.tagName === "TEXTAREA" ||
+                target.isContentEditable
+            );
+        };
         const handleKeyDown = (e: KeyboardEvent) => {
+            const isOnInputElement = isInputElement(e);
+            if (isOnInputElement) {
+                return;
+            }
             const key = e.key.toLowerCase();
             // Check if the key is already pressed and ignore if it is
             const keysCurrentlyPressed = keysCurrentlyPressedRef.current;
@@ -91,6 +103,10 @@ export function Piano() {
         };
 
         const handleKeyUp = (e: KeyboardEvent) => {
+            const isOnInputElement = isInputElement(e);
+            if (isOnInputElement) {
+                return;
+            }
             const key = e.key.toLowerCase();
             const freq = keyToNoteMap[key];
 

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { audioProcessor } from "../utils/audio-processing";
 import { MIDIMessageCommand } from "../utils/midi-utils";
 import {
@@ -31,10 +31,16 @@ export function MIDIProvider({ children }: { children: React.ReactNode }) {
     const { addKey, removeKey } = useKeysCurrentlyPressed();
     const [MIDIDevices, setMIDIDevices] = useState<MIDIInput[]>([]);
     const [selectedMIDIDevice, setSelectedMIDIDevice] = useState<MIDIInput>();
+    const MIDIDevicesRef = useRef<MIDIInput[]>([]);
+
+    useEffect(() => {
+        MIDIDevicesRef.current = MIDIDevices;
+    }, [MIDIDevices]);
 
     useEffect(() => {
         const onMIDISuccess = (midiAccess: MIDIAccess) => {
             midiAccess.onstatechange = (state) => {
+                midiAccess.onstatechange = null;
                 onMIDISuccess(state.currentTarget as MIDIAccess);
             };
             const inputs = midiAccess.inputs.values();
@@ -53,7 +59,14 @@ export function MIDIProvider({ children }: { children: React.ReactNode }) {
                 const selectedDevice = inputArray.find(
                     (device) => device.id === localStorageSelectedMIDIDevice
                 );
-                if (selectedDevice) {
+                const newDevice = inputArray.find(
+                    (device) =>
+                        !MIDIDevicesRef.current.find((d) => d.id === device.id)
+                );
+
+                if (newDevice && MIDIDevicesRef.current.length > 0) {
+                    setSelectedMIDIDevice(newDevice);
+                } else if (selectedDevice) {
                     setSelectedMIDIDevice(selectedDevice);
                 } else {
                     setSelectedMIDIDevice(inputArray[0]);
@@ -73,10 +86,12 @@ export function MIDIProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     useEffect(() => {
-        localStorage.setItem(
-            "selectedMIDIDevice",
-            selectedMIDIDevice?.id || ""
-        );
+        if (selectedMIDIDevice) {
+            localStorage.setItem(
+                "selectedMIDIDevice",
+                selectedMIDIDevice?.id || ""
+            );
+        }
         const onMIDIMessage = (event: MIDIMessageEvent) => {
             const [command, note] = event.data;
             const octave = Math.floor(note / 12) - 1;

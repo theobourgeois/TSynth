@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useRecorder } from "../../providers/recorder-provider";
 import { createStyles } from "../../utils/theme-utils";
+import { Button, TextField } from "../screen/inputs";
 import { RecordingWaveform } from "./recording-waveform";
 
 const useStyles = createStyles((theme, isRecording) => ({
@@ -11,6 +13,7 @@ const useStyles = createStyles((theme, isRecording) => ({
         borderRadius: "0.2rem",
     },
     recordIcon: {
+        cursor: "pointer",
         width: "2rem",
         height: "2rem",
         backgroundColor: isRecording
@@ -36,8 +39,10 @@ export function Recorder() {
         stopRecording,
         isDoneRecording,
         downloadRecording,
+        clearRecording,
     } = useRecorder();
     const styles = useStyles(isRecording);
+    const [fileName, setFileName] = useState("File name");
 
     const handleToggleRecording = () => {
         if (isRecording) {
@@ -45,6 +50,10 @@ export function Recorder() {
         } else {
             startRecording();
         }
+    };
+
+    const handleChangeFileName = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFileName(e.target.value);
     };
 
     return (
@@ -55,12 +64,22 @@ export function Recorder() {
                     <div style={styles.recordIconInnerCircle}></div>
                 </div>
                 {isDoneRecording && (
-                    <button
-                        className="bg-white"
-                        onClick={() => downloadRecording("ehlloworld")}
-                    >
-                        Download
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <TextField
+                            className="w-32"
+                            value={fileName}
+                            onChange={handleChangeFileName}
+                            placeholder="Enter file name"
+                        />
+                        <Button
+                            variant="secondary"
+                            disabled={!fileName}
+                            onClick={() => downloadRecording(fileName)}
+                        >
+                            Download
+                        </Button>
+                        <Button onClick={clearRecording}>Clear</Button>
+                    </div>
                 )}
             </div>
             <RecordingWaveform />

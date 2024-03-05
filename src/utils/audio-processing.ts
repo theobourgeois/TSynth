@@ -87,11 +87,33 @@ export class AudioProcessor {
 
 export const audioProcessor = new AudioProcessor();
 
+async function toBlobURL(url, mimeType) {
+  // Fetch the resource from the URL
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+  }
+
+  // Read the response as a Blob
+  const blob = await response.blob();
+
+  // Optional: If you want to ensure the Blob's type, you can recreate the Blob with a specific MIME type
+  const typedBlob = new Blob([blob], { type: mimeType });
+
+  // Create and return a URL for the Blob
+  return URL.createObjectURL(typedBlob);
+}
+
+const ffmpeg = new FFmpeg()
 
 export async function convertWebmToMp3(webmBlob: Blob, fileName: string): Promise<Blob> {
-  const ffmpeg = new FFmpeg()
-  await ffmpeg.load();
-  console.log('loaded')
+  const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
+  const coreURL = await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript');
+  const wasmURL = await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm');
+  await ffmpeg.load({
+    coreURL,
+    wasmURL,
+  });
 
   const inputName = `${fileName}.webm`;
   const outputName = `${fileName}.mp3`
