@@ -86,6 +86,8 @@ export class AudioProcessor {
       "src/worklets/audio-processor.js"
     );
 
+    console.log('started worklet')
+
     if (this.audioProcessingNode) {
       this.stopAudioProcessor();
     }
