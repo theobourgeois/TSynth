@@ -82,7 +82,9 @@ export function MIDIProvider({ children }: { children: React.ReactNode }) {
             console.error(`Failed to get MIDI access - ${msg}`);
         };
 
-        navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+        if (navigator.requestMIDIAccess) {
+            navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+        }
     }, []);
 
     useEffect(() => {
