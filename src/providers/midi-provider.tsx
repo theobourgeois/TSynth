@@ -28,7 +28,8 @@ export function useMIDI() {
 }
 
 export function MIDIProvider({ children }: { children: React.ReactNode }) {
-    const { addKey, removeKey } = useKeysCurrentlyPressed();
+    const { addKey, removeKey, keysCurrentlyPressed } =
+        useKeysCurrentlyPressed();
     const [MIDIDevices, setMIDIDevices] = useState<MIDIInput[]>([]);
     const [selectedMIDIDevice, setSelectedMIDIDevice] = useState<MIDIInput>();
     const MIDIDevicesRef = useRef<MIDIInput[]>([]);
@@ -95,10 +96,16 @@ export function MIDIProvider({ children }: { children: React.ReactNode }) {
             );
         }
         const onMIDIMessage = (event: MIDIMessageEvent) => {
-            const [command, note] = event.data;
+            let [command, note] = event.data;
             const octave = Math.floor(note / 12) - 1;
             const noteName = Object.keys(NOTES)[note % 12] as Note;
             const frequency = getNoteFrequency(noteName, octave);
+
+            // if the note is already pressed, we should send a note off message
+            // This happens with some MIDI controllers
+            if (keysCurrentlyPressed[frequency]) {
+                command = MIDIMessageCommand.NOTE_OFF;
+            }
 
             switch (command) {
                 case MIDIMessageCommand.NOTE_ON:

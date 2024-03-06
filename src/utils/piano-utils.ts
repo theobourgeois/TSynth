@@ -95,7 +95,7 @@ const useSelectedKeysStore = create<SelectedKeysState>((set) => ({
   }),
   removeKey: (key: number) => set((state) => {
     const newState = { ...state };
-    newState.keysCurrentlyPressed[key] = false;
+    delete newState.keysCurrentlyPressed[key];
     return newState
   })
 }));
