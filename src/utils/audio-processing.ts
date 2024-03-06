@@ -1,5 +1,6 @@
 import { SynthState } from "./synth-utils";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
+import AudioProcessorWorker from '../worklets/audio-processor?url';
 
 export class AudioProcessor {
   audioContext: AudioContext | null = null;
@@ -82,8 +83,8 @@ export class AudioProcessor {
     }
 
     try {
-      await this.audioContext.audioWorklet.addModule(new
-        URL("src/worklets/audio-processor.js", import.meta.url)
+      await this.audioContext.audioWorklet.addModule(
+        AudioProcessorWorker
       );
     } catch (error) {
       console.error('Error starting worklet:', error)
