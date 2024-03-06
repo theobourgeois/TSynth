@@ -15,7 +15,7 @@ function getYFromSample(sample: SampleType, phase: number) {
         case SampleType.Sine:
             return Math.sin(phase);
         case SampleType.Square:
-            return Math.sign(Math.sin(phase));
+            return -Math.sign(Math.sin(phase)) + 1;
         case SampleType.Triangle:
             return Math.asin(Math.sin(phase)) * (2 / Math.PI);
         case SampleType.Sawtooth:

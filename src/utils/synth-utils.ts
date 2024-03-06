@@ -162,14 +162,14 @@ const initialEnvelope: Envelope = {
     curveY: 0,
   },
   hold: {
-    x: 0.1,
+    x: 0,
     y: 0,
     curveX: 0,
     curveY: 0,
   },
   decay: {
     x: 0.3,
-    y: 0.7,
+    y: 0,
     curveX: 0,
     curveY: 0,
   },

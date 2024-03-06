@@ -1,4 +1,3 @@
-import { Screens, useScreen } from "../../utils/screens-utils";
 import {
     Envelope,
     LFOAttachement,
@@ -11,13 +10,11 @@ import { OptionWrapper } from "./border";
 
 export function EnvelopeOptions() {
     const { envelope, setEnvelope } = useSynth();
-    const { setActiveScreen } = useScreen();
 
     // change non-sustain envelope values
     const handleChangeEnvelope =
         <T extends keyof Envelope>(options: T) =>
         (value: Envelope[T]["x"]) => {
-            setActiveScreen(Screens.ENVELOPE);
             setEnvelope({
                 ...envelope,
                 [options]: {
@@ -30,7 +27,6 @@ export function EnvelopeOptions() {
     // change sustain envelope value
     // Changing sustain changes the y value (volume) of the decay node
     const handleChangeEnvelopeSustain = (value: number) => {
-        setActiveScreen(Screens.ENVELOPE);
         setEnvelope({
             ...envelope,
             decay: {
