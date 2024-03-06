@@ -7,6 +7,10 @@ export class AudioProcessor {
   audioProcessingNode: AudioWorkletNode | undefined;
   sampleBufferListener: ((buffer: Float32Array) => void) | undefined;
 
+  constructor() {
+    this.audioContext = new AudioContext();
+  }
+
   async setProcessorData(data: Omit<SynthState, "LFO">) {
     console.log({
       data, audioContext: this.audioContext, audioProcessingNode: this.audioProcessingNode
