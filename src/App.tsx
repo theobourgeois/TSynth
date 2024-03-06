@@ -6,7 +6,7 @@ function App() {
     return (
         <SynthWrapper>
             <div
-                className="absolute top-4 flex flex-col items-center justify-center"
+                className="flex flex-col items-center justify-center"
                 onContextMenu={(e) => e.preventDefault()}
             >
                 <Synth />
