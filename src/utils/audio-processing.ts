@@ -15,9 +15,19 @@ export class AudioProcessor {
     if (!this.audioProcessingNode) {
       await this.startAudioWorklets();
     }
-    this.audioProcessingNode?.port.postMessage(data);
+    this.audioProcessingNode?.port.postMessage({ synth: data });
     if (!this?.audioProcessingNode?.port) return;
+
+    // return if the message event listener is already set
+    if (this.audioProcessingNode.port.onmessage) {
+      return;
+    }
+    // used to visualize the audio buffer
     this.audioProcessingNode.port.onmessage = (event) => {
+      if (event.data.log) {
+        console.log(...event.data.log);
+        return;
+      }
       const sampleBuffer = event.data.sampleBuffer;
       if (sampleBuffer) {
         this.sampleBufferListener?.(sampleBuffer);
@@ -45,15 +55,9 @@ export class AudioProcessor {
   }
 
   play(frequency: number) {
-    if (!this.audioContext) {
-      this.audioContext = new AudioContext();
-    }
     if (this.audioContext.state === "suspended") {
       this.audioContext.resume();
     }
-    this.audioProcessingNode?.parameters
-      ?.get("playing")
-      ?.setValueAtTime(1, this.audioContext.currentTime);
     this.audioProcessingNode?.port.postMessage({ addFrequency: frequency });
   }
 

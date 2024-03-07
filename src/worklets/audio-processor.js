@@ -28,14 +28,23 @@ class AudioProcessor extends AudioWorkletProcessor {
                 this.handleRemoveFrequency(event.data.removeFrequency);
                 return;
             }
-            this.refreshSynthState(
-                event.data.master,
-                event.data.envelope,
-                event.data.oscillator1,
-                event.data.oscillator2,
-                event.data.filter
-            );
+            if (event.data.synth) {
+                const synthData = event.data.synth;
+                this.refreshSynthState(
+                    synthData.master,
+                    synthData.envelope,
+                    synthData.oscillator1,
+                    synthData.oscillator2,
+                    synthData.filter
+                );
+                return;
+            }
         };
+    }
+
+    // log a message to the main thread
+    log(...message) {
+        this.port.postMessage({ log: message });
     }
 
     /**
@@ -62,13 +71,13 @@ class AudioProcessor extends AudioWorkletProcessor {
             currentTime: currentTime,
             levelToRelease: 0,
         };
+        this.log(this.frequencies.length);
 
         const frequencyIndex = this.frequencies.findIndex(
             (f) => f.frequency === frequency
         );
         if (frequencyIndex !== -1) {
-            this.frequencies.splice(frequencyIndex, 1);
-            this.frequencies.push(newFrequency);
+            this.frequencies[frequencyIndex] = newFrequency;
             return;
         }
 
@@ -86,8 +95,7 @@ class AudioProcessor extends AudioWorkletProcessor {
         );
 
         if (frequencyIndex !== -1) {
-            this.frequencies[frequencyIndex].timeOfRelease =
-                new Date().getTime();
+            this.frequencies[frequencyIndex].timeOfRelease = currentTime;
         }
     }
 
@@ -97,11 +105,10 @@ class AudioProcessor extends AudioWorkletProcessor {
      * @returns
      */
     getReleaseWeight(frequencyIndex) {
-        const releaseTime = this.envelope.release.x;
+        const releaseTime = this.envelope.release.x / 1000;
         const levelToRelease = this.frequencies[frequencyIndex].levelToRelease;
         const timeSinceRelease =
-            new Date().getTime() -
-            this.frequencies[frequencyIndex].timeOfRelease;
+            currentTime - this.frequencies[frequencyIndex].timeOfRelease;
         const releaseWeight = Math.max(
             Math.min(1 - timeSinceRelease / releaseTime, 1),
             0
@@ -221,13 +228,19 @@ class AudioProcessor extends AudioWorkletProcessor {
     process(inputs, outputs) {
         const output = outputs[0];
 
-        if (this.frequencies.length === 0) {
-            return true;
-        }
-
         for (let i = 0; i < output[0].length; ++i) {
             // iterate through each frequency and calculate the output
             for (let f = 0; f < this.frequencies.length; ++f) {
+                // if the note is released and has finished playing, remove it
+                if (
+                    this.frequencies[f].timeOfRelease !== null &&
+                    (currentTime - this.frequencies[f].timeOfRelease) * 1000 >
+                        this.envelope.release.x
+                ) {
+                    this.frequencies.splice(f, 1);
+                    f--;
+                    continue;
+                }
                 const frequency = this.frequencies[f].frequency;
                 const frameIndex = currentFrame + i;
                 this.buffer[0] = 0;

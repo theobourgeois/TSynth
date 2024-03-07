@@ -1,4 +1,4 @@
-import { useSynth } from "../../utils/synth-utils";
+import { getDenormalizedAudioLevel, useSynth } from "../../utils/synth-utils";
 import { Knob } from "./knob";
 
 export function MasterKnob() {
