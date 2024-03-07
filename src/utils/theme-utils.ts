@@ -3,6 +3,7 @@ import _default from "../themes/default.json";
 import _blue from "../themes/blue.json";
 import _pink from "../themes/pink.json";
 import _dark from "../themes/dark.json";
+import _yellow from "../themes/yellow.json";
 
 export type Theme = typeof _default;
 export type ThemeTypes = keyof typeof themes;
@@ -22,6 +23,7 @@ export const themes = {
     blue: _blue,
     pink: _pink,
     dark: _dark,
+    yellow: _yellow,
 };
 
 export const useThemeStore = create<ThemeStore>((set) => ({

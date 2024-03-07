@@ -22,6 +22,5 @@
     "master": "#FF3D3D"
   },
   "text": "#FFFFFF",
-  "textOn": "#A3D3FF",
-  "dragger": "#1D2E46" 
+  "textOn": "#A3D3FF"
 }
