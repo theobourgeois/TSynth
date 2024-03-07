@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-ignore
 // TODO remove this ^ when you're using control points
 import { useTheme } from "../../utils/theme-utils";
 import { Dimensions } from "../../utils/typings-utils";
