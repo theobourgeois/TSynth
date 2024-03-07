@@ -16,6 +16,7 @@ class AudioProcessor extends AudioWorkletProcessor {
         // sent to the front end for audio visualisation
         this.sampleBuffer = new Float32Array(SAMPLE_BUFFER_LENGTH);
         this.currentSampleIndex = 0;
+        this.buffer = [0, 0];
         this.phase = 0;
         this.frequencies = [];
         this.port.onmessage = (event) => {
@@ -145,7 +146,8 @@ class AudioProcessor extends AudioWorkletProcessor {
         const isNoteReleased = timeOfRelease !== null;
         if (isNoteReleased) {
             const releaseWeight = this.getReleaseWeight(frequencyIndex);
-            return releaseWeight;
+            this.buffer[0] *= releaseWeight;
+            this.buffer[1] *= releaseWeight;
         }
 
         const attackTime = this.envelope.attack.x;
@@ -160,7 +162,8 @@ class AudioProcessor extends AudioWorkletProcessor {
         // when the note releases, this code wont be reached
         this.frequencies[frequencyIndex].levelToRelease = totalEnvelopeWeight;
 
-        return totalEnvelopeWeight;
+        this.buffer[0] *= totalEnvelopeWeight;
+        this.buffer[1] *= totalEnvelopeWeight;
     }
 
     /**
@@ -170,7 +173,7 @@ class AudioProcessor extends AudioWorkletProcessor {
         const oscillator =
             oscillatorIndex === 1 ? this.oscillator1 : this.oscillator2;
         if (!oscillator.enabled) {
-            return [0, 0];
+            return;
         }
 
         const dataLength = oscillator.wave.data.length;
@@ -182,10 +185,6 @@ class AudioProcessor extends AudioWorkletProcessor {
         const pan = oscillator.pan;
         const leftPan = pan <= 0 ? 1 : 1 - pan;
         const rightPan = pan >= 0 ? 1 : 1 + pan;
-
-        const data = [];
-        data[0] = 0;
-        data[1] = 0;
 
         const maxDetuneCents = 50;
 
@@ -204,15 +203,13 @@ class AudioProcessor extends AudioWorkletProcessor {
                 (frameIndex * newPlaybackRate) % dataLength
             );
 
-            data[0] += waveData[sampleIndex] / unison;
-            data[1] += waveData[sampleIndex] / unison;
+            this.buffer[0] += waveData[sampleIndex] / unison;
+            this.buffer[1] += waveData[sampleIndex] / unison;
         }
 
         // apply the level and pan
-        data[0] *= level * leftPan;
-        data[1] *= level * rightPan;
-
-        return data;
+        this.buffer[0] *= level * leftPan;
+        this.buffer[1] *= level * rightPan;
     }
 
     /**
@@ -233,28 +230,23 @@ class AudioProcessor extends AudioWorkletProcessor {
             for (let f = 0; f < this.frequencies.length; ++f) {
                 const frequency = this.frequencies[f].frequency;
                 const frameIndex = currentFrame + i;
+                this.buffer[0] = 0;
+                this.buffer[1] = 0;
 
-                const envelopeWeight = this.getEnvelopeWeight(f);
-                const oscillator1Weight = this.getOscillatorWeight({
+                this.getOscillatorWeight({
                     oscillatorIndex: 1,
                     frequency,
                     frameIndex,
                 });
-                const oscillator2Weight = this.getOscillatorWeight({
+                this.getOscillatorWeight({
                     oscillatorIndex: 2,
                     frequency,
                     frameIndex,
                 });
+                this.getEnvelopeWeight(f);
 
-                const left =
-                    (oscillator1Weight[0] + oscillator2Weight[0]) *
-                    envelopeWeight;
-                const right =
-                    (oscillator1Weight[1] + oscillator2Weight[1]) *
-                    envelopeWeight;
-
-                output[0][i] += left;
-                output[1][i] += right;
+                output[0][i] += this.buffer[0];
+                output[1][i] += this.buffer[1];
             }
         }
 
