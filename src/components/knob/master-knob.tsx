@@ -8,7 +8,14 @@ export function MasterKnob() {
     };
     return (
         <div className="scale-[1.3]">
-            <Knob onChange={handleChange} value={master} isMaster />
+            <Knob
+                onChange={handleChange}
+                value={master}
+                isMaster
+                indicatorText={(value) =>
+                    getDenormalizedAudioLevel(value).toFixed(0) + " Db"
+                }
+            />
         </div>
     );
 }
