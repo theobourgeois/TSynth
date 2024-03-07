@@ -8,6 +8,7 @@ const useStyles = createStyles((theme) => ({
     canvasContainer: {
         background: theme.screenPrimary,
         borderRadius: "0.3rem",
+        border: `2px solid ${theme.screenSecondary}40`,
     },
 }));
 
@@ -58,7 +59,7 @@ export function RecordingWaveform() {
             context.beginPath();
             context.moveTo(0, amp);
 
-            for (let x = 0; x < width; x++) {
+            for (let x = 0; x < width - 5; x++) {
                 const min = x * step;
                 let max = min + step;
                 max =
@@ -82,7 +83,7 @@ export function RecordingWaveform() {
         <div
             ref={containerRef}
             style={styles.canvasContainer}
-            className="w-full h-16"
+            className="w-full h-44"
         >
             <canvas ref={canvasRef} width={width} height={height}></canvas>
         </div>
