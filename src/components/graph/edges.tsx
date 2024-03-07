@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-nocheck
 // TODO remove this ^ when you're using control points
 import { useTheme } from "../../utils/theme-utils";
 import { Dimensions } from "../../utils/typings-utils";
