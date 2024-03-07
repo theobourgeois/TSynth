@@ -110,7 +110,7 @@ export function Nodes({
                 <div
                     key={node.id}
                     onDoubleClick={handleDeleteNode(node)}
-                    className="absolute z-30 rounded-full border-2 cursor-pointer"
+                    className="absolute z-30 rounded-full cursor-pointer"
                     onMouseDown={handleMouseDown(node)}
                     style={{
                         ...styles.node,

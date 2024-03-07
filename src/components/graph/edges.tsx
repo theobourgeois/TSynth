@@ -211,7 +211,7 @@ function Edge({
 
     return (
         <>
-            {showNodes && (
+            {/* {showNodes && (
                 <div
                     className="absolute z-20 bg-black rounded-full cursor-pointer"
                     onMouseDown={handleMouseDown}
@@ -224,7 +224,7 @@ function Edge({
                         backgroundColor: theme.screenNode,
                     }}
                 ></div>
-            )}
+            )} */}
             <svg className="absolute" viewBox={viewBox}>
                 <path
                     d={path}

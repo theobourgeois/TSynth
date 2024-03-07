@@ -45,10 +45,21 @@ const useStyles = createStyles((theme, isSelectedValue, isHovering) => ({
         padding: "0.2rem 0.5rem",
         borderRadius: "0.2rem",
     },
+    selectArrow: {
+        width: 0,
+        height: 0,
+        borderLeft: "5px solid transparent",
+        borderRight: "5px solid transparent",
+
+        borderTop: `8px solid ${theme.screenSecondary}`,
+        filter: `drop-shadow(0 0 2px ${theme.screenSecondary})`,
+        cursor: "pointer",
+    },
 }));
 
 type SelectProps = {
     value: string;
+    noDataMessage?: string;
     onChange: (value: string) => void;
     options: {
         label: string;
@@ -56,7 +67,12 @@ type SelectProps = {
     }[];
 };
 
-export function Select({ value, options, onChange }: SelectProps) {
+export function Select({
+    value,
+    options,
+    onChange,
+    noDataMessage,
+}: SelectProps) {
     const styles = useStyles();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -65,6 +81,7 @@ export function Select({ value, options, onChange }: SelectProps) {
     };
 
     const handleOpen = () => {
+        if (options.length === 0) return;
         setIsOpen(!isOpen);
     };
 
@@ -93,12 +110,17 @@ export function Select({ value, options, onChange }: SelectProps) {
                 style={styles.select}
                 onClick={handleOpen}
             >
-                {label}
-                <UpDownButton
-                    onDown={handlePrev}
-                    onUp={handleNext}
-                    horizontal
-                />
+                <div className="flex items-center gap-2">
+                    <button style={styles.selectArrow}></button>
+                    {label ?? noDataMessage}
+                </div>
+                {options.length > 0 && (
+                    <UpDownButton
+                        onDown={handlePrev}
+                        onUp={handleNext}
+                        horizontal
+                    />
+                )}
                 <div
                     style={styles.optionList}
                     className={cn(

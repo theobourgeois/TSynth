@@ -35,6 +35,7 @@ export function Settings() {
             <div className="flex-grow">
                 <Label>MIDI input device</Label>
                 <Select
+                    noDataMessage="No MIDI devices found"
                     value={selectedMIDIDevice?.id ?? ""}
                     onChange={handleChangeMIDIDevice}
                     options={MIDIDevices.map((device) => ({
